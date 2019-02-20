@@ -14,14 +14,21 @@
     You should have received a copy of the GNU General Public License
     along with SudokuSolver.  If not, see <http://www.gnu.org/licenses/>
 */
-#include <iostream>
 
-#include "board.h"
-void printStartInfo() {
-	std::cout<<"SudokuSolver by Marco Belli"<<std::endl;
-}
+#ifndef _VALUES_H
+#define _VALUES_H
 
-int main() {
-	printStartInfo();
-	return 0;
-}
+enum values {
+	VALUE_ONE,
+	VALUE_TWO,
+	VALUE_THREE,
+	VALUE_FOUR,
+	VALUE_FIVE,
+	VALUE_SIX,
+	VALUE_SEVEN,
+	VALUE_EIGHT,
+	VALUE_NINE,
+	VALUE_NONE = -1
+};
+
+#endif
