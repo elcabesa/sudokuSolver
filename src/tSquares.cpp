@@ -15,7 +15,11 @@
     along with SudokuSolver.  If not, see <http://www.gnu.org/licenses/>
 */
 
-
+#include <cassert>
 #include "tSquares.h"
 
-squares getSquare(const files f, const rows r) {return static_cast<squares>(r + f * rowNumber);}
+squares getSquare(const files f, const rows r) {
+	assert(f >= FILE_1 && f <= FILE_9);
+	assert(r >= ROW_A && r <= ROW_I);
+	return static_cast<squares>(r + f * rowNumber);
+}

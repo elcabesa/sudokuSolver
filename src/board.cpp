@@ -31,3 +31,10 @@ void Board::setSquareValue(const squares sn, const values v) {
 	assert(v == VALUE_NONE || (v >= VALUE_ONE  && v  <= VALUE_NINE));
 	_squares[sn] = v;
 }
+
+values Board::getSquareValue(const files f, const rows r) const {
+	return getSquareValue(getSquare(f, r));
+}
+void Board::setSquareValue(const files f, const rows r, const values v) {
+	setSquareValue(getSquare(f, r), v);
+}
