@@ -57,6 +57,6 @@ const std::array<std::vector<squares>, boxNumber> squaresIterator::boxes = {{
 
 }};
 
-const std::array<rows, rowNumber> squaresIterator::row = {ROW_1, ROW_2, ROW_3, ROW_4, ROW_5, ROW_6, ROW_7, ROW_8, ROW_9};
-const std::array<files, fileNumber> squaresIterator::file = {FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H, FILE_I};
+const std::array<rows, rowNumber> squaresIterator::row = {ROW_A, ROW_B, ROW_C, ROW_D, ROW_E, ROW_F, ROW_G, ROW_H, ROW_I};
+const std::array<files, fileNumber> squaresIterator::file = {FILE_1, FILE_2, FILE_3, FILE_4, FILE_5, FILE_6, FILE_7, FILE_8, FILE_9};
 const std::array<boxes, boxNumber> squaresIterator::box = {BOX_1, BOX_2, BOX_3, BOX_4, BOX_5, BOX_6, BOX_7, BOX_8, BOX_9};

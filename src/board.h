@@ -29,8 +29,8 @@ public:
 	explicit Board();
 	values getSquareValue(const squares sn) const;
 	void setSquareValue(const squares sn, const values v);
-	values getSquareValue(const files f, const rows r) const;
-	void setSquareValue(const files f, const rows r, const values v);
+	values getSquareValue(const rows r, const files f) const;
+	void setSquareValue(const rows r, const files f, const values v);
 private:
 	std::array<values, squareNumber> _squares;
 };

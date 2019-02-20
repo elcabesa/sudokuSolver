@@ -19,29 +19,29 @@
 #define _TSQUARES_H
 
 enum rows {
-	ROW_1,
-	ROW_2,
-	ROW_3,
-	ROW_4,
-	ROW_5,
-	ROW_6,
-	ROW_7,
-	ROW_8,
-	ROW_9,
+	ROW_A,
+	ROW_B,
+	ROW_C,
+	ROW_D,
+	ROW_E,
+	ROW_F,
+	ROW_G,
+	ROW_H,
+	ROW_I,
 	rowNumber,
 	startRow = 0
 };
 
 enum files {
-	FILE_A,
-	FILE_B,
-	FILE_C,
-	FILE_D,
-	FILE_E,
-	FILE_F,
-	FILE_G,
-	FILE_H,
-	FILE_I,
+	FILE_1,
+	FILE_2,
+	FILE_3,
+	FILE_4,
+	FILE_5,
+	FILE_6,
+	FILE_7,
+	FILE_8,
+	FILE_9,
 	fileNumber,
 	startFile = 0
 };
@@ -77,6 +77,6 @@ enum squares {
 inline squares& operator++(squares& d) { d = static_cast<squares>(static_cast<int>(d) + 1); return d; }
 inline squares& operator--(squares& d) { d = static_cast<squares>(static_cast<int>(d) - 1); return d; }
 
-squares getSquare(const files f, const rows r);
+squares getSquare(const rows r, const files f);
 
 #endif

@@ -32,9 +32,9 @@ void Board::setSquareValue(const squares sn, const values v) {
 	_squares[sn] = v;
 }
 
-values Board::getSquareValue(const files f, const rows r) const {
-	return getSquareValue(getSquare(f, r));
+values Board::getSquareValue(const rows r, const files f) const {
+	return getSquareValue(getSquare(r, f));
 }
-void Board::setSquareValue(const files f, const rows r, const values v) {
-	setSquareValue(getSquare(f, r), v);
+void Board::setSquareValue(const rows r, const files f, const values v) {
+	setSquareValue(getSquare(r, f), v);
 }

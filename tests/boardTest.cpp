@@ -47,4 +47,17 @@ namespace {
 		b.setSquareValue(A4, VALUE_NONE);
 		ASSERT_EQ(b.getSquareValue(A4), VALUE_NONE);
 	}
+	
+	TEST(Board, setGet2)
+	{
+		Board b;
+		
+		b.setSquareValue(ROW_A, FILE_4, VALUE_FIVE);
+		ASSERT_EQ(b.getSquareValue(A4), VALUE_FIVE);
+		
+		b.setSquareValue(D7, VALUE_TWO);
+	
+		ASSERT_EQ(b.getSquareValue(ROW_D, FILE_7), VALUE_TWO);
+		
+	}
 }

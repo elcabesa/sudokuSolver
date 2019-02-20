@@ -22,8 +22,8 @@ namespace {
 	
 	TEST(tSquare, getSquare)
 	{
-		ASSERT_EQ(getSquare(FILE_D, ROW_3), D3);
-		ASSERT_EQ(getSquare(FILE_I, ROW_2), I2);
-		ASSERT_EQ(getSquare(FILE_A, ROW_7), A7);
+		ASSERT_EQ(getSquare(ROW_D, FILE_3), D3);
+		ASSERT_EQ(getSquare(ROW_I, FILE_2), I2);
+		ASSERT_EQ(getSquare(ROW_A, FILE_7), A7);
 	}
 }
