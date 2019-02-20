@@ -23,8 +23,29 @@ namespace {
 	TEST(Board, ctor)
 	{
 		Board b;
-		for ( squares s = startSquare; s< squareNumber; ++s) {
+		for (squares s = startSquare; s< squareNumber; ++s) {
 			ASSERT_EQ(b.getSquareValue(s), VALUE_NONE);
 		}
+	}
+	
+	TEST(Board, setGet)
+	{
+		Board b;
+		
+		b.setSquareValue(A4, VALUE_FIVE);
+		b.setSquareValue(D7, VALUE_TWO);
+		
+		ASSERT_EQ(b.getSquareValue(A4), VALUE_FIVE);
+		ASSERT_EQ(b.getSquareValue(D7), VALUE_TWO);
+		
+		for (squares s = startSquare; s< squareNumber; ++s) {
+			if (s != A4 && s != D7) {
+				ASSERT_EQ(b.getSquareValue(s), VALUE_NONE);
+			}
+		}
+		
+		b.setSquareValue(A4, VALUE_NONE);
+		ASSERT_EQ(b.getSquareValue(A4), VALUE_NONE);
+s
 	}
 }
