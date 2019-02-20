@@ -46,6 +46,5 @@ namespace {
 		
 		b.setSquareValue(A4, VALUE_NONE);
 		ASSERT_EQ(b.getSquareValue(A4), VALUE_NONE);
-s
 	}
 }
