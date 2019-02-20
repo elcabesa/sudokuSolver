@@ -27,12 +27,12 @@
 class Board {
 public:
 	explicit Board();
-	values getSquareValue(const squares sn) const;
-	void setSquareValue(const squares sn, const values v);
-	values getSquareValue(const rows r, const files f) const;
-	void setSquareValue(const rows r, const files f, const values v);
+	tValues getSquareValue(const tSquares sn) const;
+	void setSquareValue(const tSquares sn, const tValues v);
+	tValues getSquareValue(const tRows r, const tFiles f) const;
+	void setSquareValue(const tRows r, const tFiles f, const tValues v);
 private:
-	std::array<values, squareNumber> _squares;
+	std::array<tValues, squareNumber> _squares;
 };
 
 #endif

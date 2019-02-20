@@ -21,20 +21,20 @@
 
 Board::Board() { std::fill(_squares.begin(), _squares.end(), VALUE_NONE);}
 
-values Board::getSquareValue(const squares sn) const {
+tValues Board::getSquareValue(const tSquares sn) const {
 	assert(sn >= startSquare && sn <= squareNumber);
 	return _squares[sn];
 }
 
-void Board::setSquareValue(const squares sn, const values v) {
+void Board::setSquareValue(const tSquares sn, const tValues v) {
 	assert(sn >= startSquare && sn <= squareNumber);
-	assert(v == VALUE_NONE || (v >= VALUE_ONE  && v  <= VALUE_NINE));
+	assert(v == VALUE_NONE || (v >= VALUE_1  && v  <= VALUE_9));
 	_squares[sn] = v;
 }
 
-values Board::getSquareValue(const rows r, const files f) const {
+tValues Board::getSquareValue(const tRows r, const tFiles f) const {
 	return getSquareValue(getSquare(r, f));
 }
-void Board::setSquareValue(const rows r, const files f, const values v) {
+void Board::setSquareValue(const tRows r, const tFiles f, const tValues v) {
 	setSquareValue(getSquare(r, f), v);
 }

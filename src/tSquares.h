@@ -18,7 +18,7 @@
 #ifndef _TSQUARES_H
 #define _TSQUARES_H
 
-enum rows {
+enum tRows {
 	ROW_A,
 	ROW_B,
 	ROW_C,
@@ -32,7 +32,7 @@ enum rows {
 	startRow = 0
 };
 
-enum files {
+enum tFiles {
 	FILE_1,
 	FILE_2,
 	FILE_3,
@@ -46,7 +46,7 @@ enum files {
 	startFile = 0
 };
 
-enum boxes {
+enum tBoxes {
 	BOX_1,
 	BOX_2,
 	BOX_3,
@@ -60,7 +60,7 @@ enum boxes {
 	startBox = 0
 };
 
-enum squares {
+enum tSquares {
 	A1,A2,A3,A4,A5,A6,A7,A8,A9,
 	B1,B2,B3,B4,B5,B6,B7,B8,B9,
 	C1,C2,C3,C4,C5,C6,C7,C8,C9,
@@ -74,9 +74,12 @@ enum squares {
 	startSquare = 0
 };
 
-inline squares& operator++(squares& d) { d = static_cast<squares>(static_cast<int>(d) + 1); return d; }
-inline squares& operator--(squares& d) { d = static_cast<squares>(static_cast<int>(d) - 1); return d; }
+inline tSquares& operator++(tSquares& d) { d = static_cast<tSquares>(static_cast<int>(d) + 1); return d; }
+inline tSquares& operator--(tSquares& d) { d = static_cast<tSquares>(static_cast<int>(d) - 1); return d; }
 
-squares getSquare(const rows r, const files f);
+tSquares getSquare(const tRows r, const tFiles f);
+
+tFiles getFile(const tSquares sq);
+tRows getRow(const tSquares sq);
 
 #endif

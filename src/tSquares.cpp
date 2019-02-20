@@ -18,8 +18,16 @@
 #include <cassert>
 #include "tSquares.h"
 
-squares getSquare(const rows r, const files f) {
+tSquares getSquare(const tRows r, const tFiles f) {
 	assert(f >= FILE_1 && f <= FILE_9);
 	assert(r >= ROW_A && r <= ROW_I);
-	return static_cast<squares>(f + r * fileNumber);
+	return static_cast<tSquares>(f + r * fileNumber);
+}
+
+tFiles getFile(const tSquares sq) {
+	return static_cast<tFiles>(sq % fileNumber);
+}
+
+tRows getRow(const tSquares sq) {
+	return static_cast<tRows>(sq / fileNumber);
 }

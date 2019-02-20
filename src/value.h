@@ -18,16 +18,16 @@
 #ifndef _VALUES_H
 #define _VALUES_H
 
-enum values {
-	VALUE_ONE,
-	VALUE_TWO,
-	VALUE_THREE,
-	VALUE_FOUR,
-	VALUE_FIVE,
-	VALUE_SIX,
-	VALUE_SEVEN,
-	VALUE_EIGHT,
-	VALUE_NINE,
+enum tValues {
+	VALUE_1,
+	VALUE_2,
+	VALUE_3,
+	VALUE_4,
+	VALUE_5,
+	VALUE_6,
+	VALUE_7,
+	VALUE_8,
+	VALUE_9,
 	VALUE_NONE = -1
 };
 

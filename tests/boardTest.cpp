@@ -23,7 +23,7 @@ namespace {
 	TEST(Board, ctor)
 	{
 		Board b;
-		for (squares s = startSquare; s< squareNumber; ++s) {
+		for (tSquares s = startSquare; s< squareNumber; ++s) {
 			ASSERT_EQ(b.getSquareValue(s), VALUE_NONE);
 		}
 	}
@@ -32,13 +32,13 @@ namespace {
 	{
 		Board b;
 		
-		b.setSquareValue(A4, VALUE_FIVE);
-		b.setSquareValue(D7, VALUE_TWO);
+		b.setSquareValue(A4, VALUE_5);
+		b.setSquareValue(D7, VALUE_2);
 		
-		ASSERT_EQ(b.getSquareValue(A4), VALUE_FIVE);
-		ASSERT_EQ(b.getSquareValue(D7), VALUE_TWO);
+		ASSERT_EQ(b.getSquareValue(A4), VALUE_5);
+		ASSERT_EQ(b.getSquareValue(D7), VALUE_2);
 		
-		for (squares s = startSquare; s< squareNumber; ++s) {
+		for (tSquares s = startSquare; s< squareNumber; ++s) {
 			if (s != A4 && s != D7) {
 				ASSERT_EQ(b.getSquareValue(s), VALUE_NONE);
 			}
@@ -52,12 +52,12 @@ namespace {
 	{
 		Board b;
 		
-		b.setSquareValue(ROW_A, FILE_4, VALUE_FIVE);
-		ASSERT_EQ(b.getSquareValue(A4), VALUE_FIVE);
+		b.setSquareValue(ROW_A, FILE_4, VALUE_5);
+		ASSERT_EQ(b.getSquareValue(A4), VALUE_5);
 		
-		b.setSquareValue(D7, VALUE_TWO);
+		b.setSquareValue(D7, VALUE_2);
 	
-		ASSERT_EQ(b.getSquareValue(ROW_D, FILE_7), VALUE_TWO);
+		ASSERT_EQ(b.getSquareValue(ROW_D, FILE_7), VALUE_2);
 		
 	}
 }

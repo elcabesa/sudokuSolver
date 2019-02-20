@@ -15,10 +15,11 @@
     along with SudokuSolver.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <algorithm>
 
 #include "iterators.h"
 
-const std::array<std::vector<squares>, rowNumber> squaresIterator::rows = {{
+const std::array<std::vector<tSquares>, rowNumber> squaresIterator::rows = {{
 		{A1, A2, A3, A4, A5, A6, A7, A8, A9},
 		{B1, B2, B3, B4, B5, B6, B7, B8, B9},
 		{C1, C2, C3, C4, C5, C6, C7, C8, C9},
@@ -30,7 +31,7 @@ const std::array<std::vector<squares>, rowNumber> squaresIterator::rows = {{
 		{I1, I2, I3, I4, I5, I6, I7, I8, I9}
 }};
 
-const std::array<std::vector<squares>, fileNumber> squaresIterator::files = {{
+const std::array<std::vector<tSquares>, fileNumber> squaresIterator::files = {{
 		{A1, B1, C1, D1, E1, F1, G1, H1, H1},
 		{A2, B2, C2, D2, E2, F2, G2, H2, H2},
 		{A3, B3, C3, D3, E3, F3, G3, H3, H3},
@@ -43,7 +44,7 @@ const std::array<std::vector<squares>, fileNumber> squaresIterator::files = {{
 
 }};
 
-const std::array<std::vector<squares>, boxNumber> squaresIterator::boxes = {{
+const std::array<std::vector<tSquares>, boxNumber> squaresIterator::boxes = {{
 		{A1, A2, A3, B1, B2, B3, C1, C2, C3},
 		{A4, A5, A6, B4, B5, B6, C4, C5, C6},
 		{A7, A8, A9, B7, B8, B9, C7, C8, C9},
@@ -57,6 +58,12 @@ const std::array<std::vector<squares>, boxNumber> squaresIterator::boxes = {{
 
 }};
 
-const std::array<rows, rowNumber> squaresIterator::row = {ROW_A, ROW_B, ROW_C, ROW_D, ROW_E, ROW_F, ROW_G, ROW_H, ROW_I};
-const std::array<files, fileNumber> squaresIterator::file = {FILE_1, FILE_2, FILE_3, FILE_4, FILE_5, FILE_6, FILE_7, FILE_8, FILE_9};
-const std::array<boxes, boxNumber> squaresIterator::box = {BOX_1, BOX_2, BOX_3, BOX_4, BOX_5, BOX_6, BOX_7, BOX_8, BOX_9};
+const std::array<tRows, rowNumber> squaresIterator::row = {ROW_A, ROW_B, ROW_C, ROW_D, ROW_E, ROW_F, ROW_G, ROW_H, ROW_I};
+const std::array<tFiles, fileNumber> squaresIterator::file = {FILE_1, FILE_2, FILE_3, FILE_4, FILE_5, FILE_6, FILE_7, FILE_8, FILE_9};
+const std::array<tBoxes, boxNumber> squaresIterator::box = {BOX_1, BOX_2, BOX_3, BOX_4, BOX_5, BOX_6, BOX_7, BOX_8, BOX_9};
+const std::array<tValues, 9> squaresIterator::value = {VALUE_1, VALUE_2, VALUE_3, VALUE_4, VALUE_5, VALUE_6, VALUE_7, VALUE_8, VALUE_9};
+
+bool isInRow(const tRows r, const tSquares s) {
+	const auto& x = squaresIterator::rows[r];
+	return (std::find (x.begin(), x.end(), s)!= x.end());
+}

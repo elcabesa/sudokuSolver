@@ -22,16 +22,20 @@
 #include <vector>
 
 #include "tSquares.h"
+#include "value.h"
 
 class squaresIterator {
 public:
-	static const std::array<rows, rowNumber> row;
-	static const std::array<files, fileNumber> file;
-	static const std::array<boxes, boxNumber> box;
+	static const std::array<tRows, rowNumber> row;
+	static const std::array<tFiles, fileNumber> file;
+	static const std::array<tBoxes, boxNumber> box;
+	static const std::array<tValues, 9> value;
 	
-	static const std::array<std::vector<squares>, rowNumber> rows;
-	static const std::array<std::vector<squares>, fileNumber> files;
-	static const std::array<std::vector<squares>, boxNumber> boxes;
+	static const std::array<std::vector<tSquares>, rowNumber> rows;
+	static const std::array<std::vector<tSquares>, fileNumber> files;
+	static const std::array<std::vector<tSquares>, boxNumber> boxes;
+	
+	static bool isInRow(const tSquares r);
 };
 
 #endif

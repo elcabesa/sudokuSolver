@@ -50,4 +50,14 @@ namespace {
 		}
 		ASSERT_EQ(c, 9);
 	}
+	
+	TEST(Iterator, value)
+	{
+		unsigned int c = 0;
+		for (auto v: squaresIterator::value) {		
+			ASSERT_EQ(v, c);
+			++c;
+		}
+		ASSERT_EQ(c, 9);
+	}
 }
