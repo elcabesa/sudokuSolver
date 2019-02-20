@@ -18,6 +18,48 @@
 #ifndef _TSQUARES_H
 #define _TSQUARES_H
 
+enum rows {
+	ROW_1,
+	ROW_2,
+	ROW_3,
+	ROW_4,
+	ROW_5,
+	ROW_6,
+	ROW_7,
+	ROW_8,
+	ROW_9,
+	rowNumber,
+	startRow = 0
+};
+
+enum files {
+	FILE_A,
+	FILE_B,
+	FILE_C,
+	FILE_D,
+	FILE_E,
+	FILE_F,
+	FILE_G,
+	FILE_H,
+	FILE_I,
+	fileNumber,
+	startFile = 0
+};
+
+enum boxes {
+	BOX_1,
+	BOX_2,
+	BOX_3,
+	BOX_4,
+	BOX_5,
+	BOX_6,
+	BOX_7,
+	BOX_8,
+	BOX_9,
+	boxNumber,
+	startBox = 0
+};
+
 enum squares {
 	A1,A2,A3,A4,A5,A6,A7,A8,A9,
 	B1,B2,B3,B4,B5,B6,B7,B8,B9,
@@ -34,5 +76,7 @@ enum squares {
 
 inline squares& operator++(squares& d) { d = static_cast<squares>(static_cast<int>(d) + 1); return d; }
 inline squares& operator--(squares& d) { d = static_cast<squares>(static_cast<int>(d) - 1); return d; }
+
+squares getSquare(const files f, const rows r);
 
 #endif
