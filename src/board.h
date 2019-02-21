@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <array>
+#include <vector>
 
 #include "tSquares.h"
 #include "value.h"
@@ -31,8 +32,13 @@ public:
 	void setSquareValue(const tSquares sn, const tValues v);
 	tValues getSquareValue(const tRows r, const tFiles f) const;
 	void setSquareValue(const tRows r, const tFiles f, const tValues v);
+	
+	bool checkBoard() const;
 private:
 	std::array<tValues, squareNumber> _squares;
+	static bool _areEqualValues(const tValues i, const tValues j);
+	bool _checkForDuplicate( std::vector<tSquares> in) const;
+	void _print() const;
 };
 
 #endif
