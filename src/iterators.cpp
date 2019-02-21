@@ -67,3 +67,13 @@ bool isInRow(const tRows r, const tSquares s) {
 	const auto& x = squaresIterator::rows[r];
 	return (std::find (x.begin(), x.end(), s)!= x.end());
 }
+
+bool isInFile(const tFiles f, const tSquares s) {
+	const auto& x = squaresIterator::files[f];
+	return (std::find (x.begin(), x.end(), s)!= x.end());
+}
+
+bool isInBox(const tBoxes b, const tSquares s) {
+	const auto& x = squaresIterator::boxes[b];
+	return (std::find (x.begin(), x.end(), s)!= x.end());
+}

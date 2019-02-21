@@ -35,7 +35,9 @@ public:
 	static const std::array<std::vector<tSquares>, fileNumber> files;
 	static const std::array<std::vector<tSquares>, boxNumber> boxes;
 	
-	static bool isInRow(const tSquares r);
+	static bool isInRow(const tRows r, const tSquares s);
+	static bool isInFile(const tFiles f, const tSquares s);
+	static bool isInBox(const tBoxes b, const tSquares s);
 };
 
 #endif
