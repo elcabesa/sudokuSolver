@@ -81,5 +81,8 @@ tSquares getSquare(const tRows r, const tFiles f);
 
 tFiles getFile(const tSquares sq);
 tRows getRow(const tSquares sq);
+tBoxes getBox(const tSquares sq);
+
+//TODO add print for squares, file, row, box
 
 #endif

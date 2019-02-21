@@ -34,6 +34,8 @@ public:
 	void setSquareValue(const tRows r, const tFiles f, const tValues v);
 	
 	bool checkBoard() const;
+	
+	bool contains(const std::vector<tSquares>& in, const tValues v) const;
 private:
 	std::array<tValues, squareNumber> _squares;
 	static bool _areEqualValues(const tValues i, const tValues j);

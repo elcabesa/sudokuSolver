@@ -36,8 +36,15 @@ namespace {
 	
 	TEST(tSquare, getRow)
 	{
-		ASSERT_EQ(getRow(D3),ROW_D);
-		ASSERT_EQ(getRow(I2),ROW_I);
-		ASSERT_EQ(getRow(A7),ROW_A);
+		ASSERT_EQ(getRow(D3), ROW_D);
+		ASSERT_EQ(getRow(I2), ROW_I);
+		ASSERT_EQ(getRow(A7), ROW_A);
+	}
+	
+	TEST(tSquare, getBox)
+	{
+		ASSERT_EQ(getBox(D3), BOX_4);
+		ASSERT_EQ(getBox(I2), BOX_7);
+		ASSERT_EQ(getBox(A7), BOX_3);
 	}
 }

@@ -99,3 +99,13 @@ void Board::_print() const {
 		std::cerr<<std::endl;
 	}
 }
+
+bool Board::contains(const std::vector<tSquares>& in, const tValues v) const {
+	std::vector<tValues> res;
+
+	for (const auto s: in) {
+		res.push_back(getSquareValue(s));
+	}
+	
+	return std::find(res.begin(), res.end(), v) != res.end();
+}

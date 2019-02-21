@@ -31,3 +31,7 @@ tFiles getFile(const tSquares sq) {
 tRows getRow(const tSquares sq) {
 	return static_cast<tRows>(sq / fileNumber);
 }
+
+tBoxes getBox(const tSquares sq) {
+	return static_cast<tBoxes>((3 * (getRow(sq) / 3)) + (getFile(sq) / 3));
+}
