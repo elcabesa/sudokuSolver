@@ -70,7 +70,7 @@ bool Solver::_findSingle() {
 	for (auto sq: squaresIterator::squares) {
 		if (_cand.getSize(sq) == 1) {
 			auto v = _cand.get(sq)[0];
-			std::cout<<"...Found at "<<(sq + 1)<<" value "<< (v + 1) << std::endl;
+			std::cout<<"...Found at "<< sq <<" value "<< v << std::endl;
 			_setSquareValue(sq, v);
 			return true;
 		}
@@ -91,7 +91,7 @@ bool Solver::_findHiddenSingleInRow() {
 				}
 			}
 			if (count == 1) {
-				std::cout<<"...Found at "<<(singleSq + 1)<<" value "<< (v + 1) << std::endl;
+				std::cout<<"...Found at "<< singleSq <<" value "<< v << std::endl;
 				_setSquareValue(singleSq, v);
 				return true;
 			}				
@@ -113,7 +113,7 @@ bool Solver::_findHiddenSingleInFile() {
 				}
 			}
 			if (count == 1) {
-				std::cout<<"...Found at "<<(singleSq + 1)<<" value "<< (v + 1) << std::endl;
+				std::cout<<"...Found at "<< singleSq <<" value "<< v << std::endl;
 				_setSquareValue(singleSq, v);
 				return true;
 			}				
@@ -135,7 +135,7 @@ bool Solver::_findHiddenSingleInBox() {
 				}
 			}
 			if (count == 1) {
-				std::cout<<"...Found at "<<(singleSq + 1)<<" value "<< (v + 1) << std::endl;
+				std::cout<<"...Found at "<< singleSq <<" value "<< v << std::endl;
 				_setSquareValue(singleSq, v);
 				return true;	
 			}				
@@ -148,15 +148,15 @@ bool Solver::_findNakedPairInRow() {
 	for (const auto r: squaresIterator::row) {
 		for( const auto sq1: squaresIterator::rows[r]) {
 			if (_cand.getSize(sq1) == 2) {
-				std::cout<<".found a pair at "<< (sq1 + 1)<<":";
+				std::cout<<".found a pair at "<< sq1<<":";
 				_cand.print(sq1);
 				for( const auto sq2: squaresIterator::rows[r]) {
 					if( sq2 != sq1 ) {
 						if (_cand.getSize(sq2) == 2) {
-							std::cout<<"..check candidate at "<< (sq2 + 1)<<":";
+							std::cout<<"..check candidate at "<< sq2 <<":";
 							_cand.print(sq2);
 							if (_cand.get(sq1) == _cand.get(sq2)) {
-								std::cout<<"...FOUND naked pair at "<<(sq1 + 1)<<", "<< (sq2 + 1)<<std::endl;
+								std::cout<<"...FOUND naked pair at "<< sq1 <<", "<< sq2 <<std::endl;
 								
 								auto pair = _cand.get(sq1);
 								// removed candidates from other squares in row

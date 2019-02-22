@@ -72,3 +72,18 @@ bool areOnTheSameBox(std::vector<tSquares> s) {
 	}
 	return true;
 }
+
+std::ostream& operator <<(std::ostream& stream, const tRows& r) {
+	stream << char('A' + r);
+	return stream;
+}
+
+std::ostream& operator <<(std::ostream& stream, const tFiles& f) {
+	stream << char('1' + f);
+	return stream;
+}
+
+std::ostream& operator <<(std::ostream& stream, const tSquares& sq) {
+	stream << getRow(sq) << getFile(sq);
+	return stream;
+}

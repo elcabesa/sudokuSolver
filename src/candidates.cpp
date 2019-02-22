@@ -90,7 +90,7 @@ void Candidates::print() const {
 		if( sq <=9 )
 		if( _squares[sq].size() != 0 )
 		{
-			std::cout<<"candidates for square "<< (sq + 1)<<":";
+			std::cout<<"candidates for square "<< sq <<": ";
 			print(sq);
 		}
 	}
@@ -99,7 +99,7 @@ void Candidates::print() const {
 void Candidates::print(const tSquares sq) const {
 	
 	for( auto v: _squares[sq] ) {
-		std::cout<<(v + 1)<<", ";
+		std::cout<<v<<", ";
 	}
 	std::cout<<std::endl;
 }

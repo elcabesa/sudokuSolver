@@ -18,6 +18,7 @@
 #ifndef _TSQUARES_H
 #define _TSQUARES_H
 
+#include <ostream>
 #include <vector>
 
 enum tRows {
@@ -90,6 +91,9 @@ bool areOnTheSameRow(std::vector<tSquares> s);
 bool areOnTheSameBox(std::vector<tSquares> s);
 
 
-//TODO add print for squares, file, row, box
+std::ostream& operator <<(std::ostream& stream, const tRows& v);
+std::ostream& operator <<(std::ostream& stream, const tFiles& v);
+std::ostream& operator <<(std::ostream& stream, const tSquares& v);
+
 
 #endif

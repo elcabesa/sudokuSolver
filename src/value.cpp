@@ -15,24 +15,11 @@
     along with SudokuSolver.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef _VALUES_H
-#define _VALUES_H
-
 #include <ostream>
 
-enum tValues {
-	VALUE_1,
-	VALUE_2,
-	VALUE_3,
-	VALUE_4,
-	VALUE_5,
-	VALUE_6,
-	VALUE_7,
-	VALUE_8,
-	VALUE_9,
-	VALUE_NONE = -1
-};
+#include "value.h"
 
-std::ostream& operator <<(std::ostream& stream, const tValues& v);
-
-#endif
+std::ostream& operator <<(std::ostream& stream, const tValues& v) {
+	stream << (1 + v) ;
+	return stream;
+}
