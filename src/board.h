@@ -36,11 +36,12 @@ public:
 	bool checkBoard() const;
 	
 	bool contains(const std::vector<tSquares>& in, const tValues v) const;
+	void print() const;
 private:
 	std::array<tValues, squareNumber> _squares;
 	static bool _areEqualValues(const tValues i, const tValues j);
 	bool _checkForDuplicate( std::vector<tSquares> in) const;
-	void _print() const;
+	
 };
 
 #endif

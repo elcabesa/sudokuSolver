@@ -20,6 +20,7 @@
 #include <iostream>
 
 
+#include "board.h"
 #include "candidates.h"
 #include "iterators.h"
 
@@ -37,9 +38,7 @@ void Candidates::add(const tSquares sq, tValues v) {
 	assert(sq < squareNumber && sq > startSquare);
 	assert(v >= VALUE_1 && v <= VALUE_9);
 	
-	auto & s = _squares[sq];
-	
-	if (std::find(s.begin(), s.end(), v) == s.end()) {
+	if( !contains(sq, v) ) {
 		_squares[sq].push_back(v);
 	} else {
 		std::cout<<"warning candidate already contain "<<v<<std::endl;
@@ -55,14 +54,58 @@ void Candidates::remove(const tSquares sq, tValues v) {
 	auto it = std::find(s.begin(), s.end(), v);
 	if ( it != s.end()) {
 		_squares[sq].erase(it);
-	} else {
+	}/* else {
 		std::cout<<"warning candidate oesn't contain "<<v<<std::endl;
-	}
+	}*/
 }
 
-const std::vector<tValues>& Candidates::getCandidates(const tSquares sq) const {
+const std::vector<tValues>& Candidates::get(const tSquares sq) const {
 	assert(sq < squareNumber && sq > startSquare);
 	assert(v >= VALUE_1 && v <= VALUE_9);
 	
 	return _squares[sq];
+}
+
+void Candidates::fillCandidates() {
+	for (auto r: squaresIterator::row) {
+		for (auto f: squaresIterator::file) { 
+			auto sq = getSquare(r, f);
+			for (auto v: squaresIterator::value) {
+				if( _b.getSquareValue(sq) == VALUE_NONE &&
+					!_b.contains(squaresIterator::rows[r], v) &&
+					!_b.contains(squaresIterator::files[f], v) &&
+					!_b.contains(squaresIterator::boxes[getBox(sq)], v)
+				) {
+					add(sq, v);
+				}
+			}
+				
+		}
+	}
+}
+
+void Candidates::print() const {
+	std::cout<<"INITIAL CANDIDITATES"<<std::endl;
+	
+	for (auto sq: squaresIterator::squares) {
+		if( _squares[sq].size() != 0 )
+		{
+			std::cout<<"candidates for square "<< sq + 1<<":";
+			for( auto v: _squares[sq] ) {
+				std::cout<<" "<<(v + 1)<<",";
+			}
+			std::cout<<std::endl;
+		}
+	}
+}
+
+size_t Candidates::getSize(const tSquares sq) const
+{
+	return get(sq).size();
+}
+
+bool Candidates::contains(const tSquares sq, tValues v) const {
+	const auto& values = get(sq);
+	return std::find(values.begin(), values.end(), v) != values.end();
+	
 }

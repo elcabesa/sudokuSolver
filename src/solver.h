@@ -15,32 +15,27 @@
     along with SudokuSolver.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef _CANDIDATES_H
-#define _CANDIDATES_H
+#ifndef _SOLVER_H
+#define _SOLVER_H
 
-
-#include <array>
-#include <vector>
-
-#include "tSquares.h"
+#include "Candidates.h"
 #include "value.h"
 
 class Board;
 
-class Candidates {
+class Solver {
 public:
-	Candidates(const Board& b);
-	void clear();
-	void add(const tSquares sq, tValues v);
-	void remove(const tSquares sq, tValues v);
-	const std::vector<tValues>& get(const tSquares sq) const;
-	size_t getSize(const tSquares sq) const;
-	void fillCandidates();
-	void print() const;
-	bool contains(const tSquares sq, tValues v) const;
+	Solver(Board& b);
+	void solve();
 private:
-	const Board& _b;
-	std::array<std::vector<tValues>, squareNumber> _squares;
+	Board& _b;
+	Candidates _cand;
+	
+	bool _findSingle();
+	bool _findHiddenSingleInRow();
+	bool _findHiddenSingleInFile();
+	bool _findHiddenSingleInBox();
+	void _setSquareValue(const tSquares t, const tValues v);
 };
 
 #endif

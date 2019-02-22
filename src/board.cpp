@@ -46,7 +46,7 @@ bool Board::_areEqualValues(const tValues i, const tValues j) {
 }
 
 bool Board::checkBoard() const {
-	//_print();
+	//print();
 	bool duplicate = false;
 	for (auto r: squaresIterator::row) {
 		//std::cerr<<"---- check row "<< r + 1 <<std::endl;
@@ -87,13 +87,13 @@ bool Board::_checkForDuplicate( std::vector<tSquares> in) const
 	}
 }
 
-void Board::_print() const {
+void Board::print() const {
 	std::cerr<<"BOARD"<<std::endl;
 	
 	for (auto r: squaresIterator::row) {
 		for (auto f: squaresIterator::file) {
 			auto v = getSquareValue(r, f);
-			if (v == VALUE_NONE) { std::cerr<<" "; }
+			if (v == VALUE_NONE) { std::cerr<<"x"; }
 			else { std::cerr<< (v + 1); }
 		}
 		std::cerr<<std::endl;

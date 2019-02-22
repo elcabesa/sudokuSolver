@@ -30,6 +30,7 @@ public:
 	static const std::array<tFiles, fileNumber> file;
 	static const std::array<tBoxes, boxNumber> box;
 	static const std::array<tValues, 9> value;
+	static const std::array<tSquares, 81> squares;
 	
 	static const std::array<std::vector<tSquares>, rowNumber> rows;
 	static const std::array<std::vector<tSquares>, fileNumber> files;
