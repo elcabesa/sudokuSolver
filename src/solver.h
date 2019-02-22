@@ -32,9 +32,12 @@ private:
 	Candidates _cand;
 	
 	bool _findSingle();
+	
 	bool _findHiddenSingleInRow();
 	bool _findHiddenSingleInFile();
 	bool _findHiddenSingleInBox();
+	
+	bool _findNakedPairInRow();
 	void _setSquareValue(const tSquares t, const tValues v);
 };
 

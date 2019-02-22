@@ -32,11 +32,12 @@ public:
 	Candidates(const Board& b);
 	void clear();
 	void add(const tSquares sq, tValues v);
-	void remove(const tSquares sq, tValues v);
+	bool remove(const tSquares sq, tValues v);
 	const std::vector<tValues>& get(const tSquares sq) const;
 	size_t getSize(const tSquares sq) const;
 	void fillCandidates();
 	void print() const;
+	void print(const tSquares sq) const;
 	bool contains(const tSquares sq, tValues v) const;
 private:
 	const Board& _b;

@@ -26,27 +26,28 @@
 Solver::Solver(Board& b): _b(b), _cand(b){}
 
 void Solver::solve() {
-	_b.print();
 	_cand.fillCandidates();
-	
+	_b.print();
 	do {
-		_b.print();
+		
 		_cand.print();
 		std::cout<<"Performing STEP..."<<std::endl;
-		if (_findSingle()) continue;
-		if (_findHiddenSingleInRow()) continue;
-		if (_findHiddenSingleInFile()) continue;
-		if (_findHiddenSingleInBox()) continue;
+		if (_findSingle()) { _b.print(); continue; }
+		if (_findHiddenSingleInRow()) { _b.print(); continue; }
+		if (_findHiddenSingleInFile()) { _b.print(); continue; }
+		if (_findHiddenSingleInBox()) { _b.print(); continue; }
+		if (_findNakedPairInRow()) { _b.print(); continue; }
 		
 		std::cout<<"Done"<<std::endl;
 		break;
 	}
+	
 	while (std::cin.ignore());
 	
 }
 
 void Solver::_setSquareValue(const tSquares sq, const tValues v) {
-	assert(sq < squareNumber && sq > startSquare);
+	assert(sq < squareNumber && sq >= startSquare);
 	assert(v >= VALUE_1 && v <= VALUE_9);
 	_b.setSquareValue(sq, v);
 	
@@ -65,7 +66,7 @@ void Solver::_setSquareValue(const tSquares sq, const tValues v) {
 }
 
 bool Solver::_findSingle() {
-	std::cout<<"Seraching for solved cells..."<<std::endl;
+	std::cout<<"Searching for solved cells..."<<std::endl;
 	for (auto sq: squaresIterator::squares) {
 		if (_cand.getSize(sq) == 1) {
 			auto v = _cand.get(sq)[0];
@@ -78,7 +79,7 @@ bool Solver::_findSingle() {
 }
 
 bool Solver::_findHiddenSingleInRow() {
-	std::cout<<"Seraching for hidden single in row..."<<std::endl;
+	std::cout<<"Searching for hidden single in row..."<<std::endl;
 	for (const auto r: squaresIterator::row) {
 		for (const auto v: squaresIterator::value) {
 			unsigned int count = 0;
@@ -100,7 +101,7 @@ bool Solver::_findHiddenSingleInRow() {
 }
 
 bool Solver::_findHiddenSingleInFile() {
-	std::cout<<"Seraching for hidden single in file..."<<std::endl;
+	std::cout<<"Searching for hidden single in file..."<<std::endl;
 	for (const auto f: squaresIterator::file) {
 		for (const auto v: squaresIterator::value) {
 			unsigned int count = 0;
@@ -122,7 +123,7 @@ bool Solver::_findHiddenSingleInFile() {
 }
 
 bool Solver::_findHiddenSingleInBox() {
-	std::cout<<"Seraching for hidden single in box..."<<std::endl;
+	std::cout<<"Searching for hidden single in box..."<<std::endl;
 	for (const auto b: squaresIterator::box) {
 		for (const auto v: squaresIterator::value) {
 			unsigned int count = 0;
@@ -138,6 +139,44 @@ bool Solver::_findHiddenSingleInBox() {
 				_setSquareValue(singleSq, v);
 				return true;	
 			}				
+		}
+	}
+	return false;
+}
+
+bool Solver::_findNakedPairInRow() {
+	for (const auto r: squaresIterator::row) {
+		for( const auto sq1: squaresIterator::rows[r]) {
+			if (_cand.getSize(sq1) == 2) {
+				std::cout<<".found a pair at "<< (sq1 + 1)<<":";
+				_cand.print(sq1);
+				for( const auto sq2: squaresIterator::rows[r]) {
+					if( sq2 != sq1 ) {
+						if (_cand.getSize(sq2) == 2) {
+							std::cout<<"..check candidate at "<< (sq2 + 1)<<":";
+							_cand.print(sq2);
+							if (_cand.get(sq1) == _cand.get(sq2)) {
+								std::cout<<"...FOUND naked pair at "<<(sq1 + 1)<<", "<< (sq2 + 1)<<std::endl;
+								
+								auto pair = _cand.get(sq1);
+								// removed candidates from other squares in row
+								bool candidatesChanged = false;
+								for( const auto sq3: squaresIterator::rows[r]) {
+									if((sq3 != sq1) && (sq3 != sq2)) {
+										//remove candidates from other squares in row
+										for (auto v: pair) {
+											candidatesChanged |= _cand.remove(sq3, v);
+										}
+									}
+								}
+								if(candidatesChanged) {
+									return true;
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 	return false;
