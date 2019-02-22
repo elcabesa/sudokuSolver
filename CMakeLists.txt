@@ -10,6 +10,9 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} --coverage")
 endif()
 
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s -static")
+
+
 set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE 1)
 
 # goole test configuration
