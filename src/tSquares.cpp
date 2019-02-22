@@ -35,3 +35,40 @@ tRows getRow(const tSquares sq) {
 tBoxes getBox(const tSquares sq) {
 	return static_cast<tBoxes>((3 * (getRow(sq) / 3)) + (getFile(sq) / 3));
 }
+
+bool areOnTheSameFile(std::vector<tSquares> s) {
+	if (s.empty()) {
+		return false;
+	}
+	const auto ref = getFile(s[0]);
+	for (auto sq: s) {
+		if (getFile(sq) != ref) {
+			return false;
+		}
+	}
+	return true;
+}
+bool areOnTheSameRow(std::vector<tSquares> s) {
+	if (s.empty()) {
+		return false;
+	}
+	const auto ref = getRow(s[0]);
+	for (auto sq: s) {
+		if (getRow(sq) != ref) {
+			return false;
+		}
+	}
+	return true;
+}
+bool areOnTheSameBox(std::vector<tSquares> s) {
+	if (s.empty()) {
+		return false;
+	}
+	const auto ref = getBox(s[0]);
+	for (auto sq: s) {
+		if (getBox(sq) != ref) {
+			return false;
+		}
+	}
+	return true;
+}

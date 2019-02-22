@@ -35,7 +35,7 @@ void Candidates::clear() {
 }
 
 void Candidates::add(const tSquares sq, tValues v) {
-	assert(sq < squareNumber && sq > startSquare);
+	assert(sq < squareNumber && sq >= startSquare);
 	assert(v >= VALUE_1 && v <= VALUE_9);
 	
 	if( !contains(sq, v) ) {
@@ -45,8 +45,8 @@ void Candidates::add(const tSquares sq, tValues v) {
 	}
 }
 
-void Candidates::remove(const tSquares sq, tValues v) {
-	assert(sq < squareNumber && sq > startSquare);
+bool Candidates::remove(const tSquares sq, tValues v) {
+	assert(sq < squareNumber && sq >= startSquare);
 	assert(v >= VALUE_1 && v <= VALUE_9);
 	
 	auto & s = _squares[sq];
@@ -54,15 +54,15 @@ void Candidates::remove(const tSquares sq, tValues v) {
 	auto it = std::find(s.begin(), s.end(), v);
 	if ( it != s.end()) {
 		_squares[sq].erase(it);
+		return true;
 	}/* else {
 		std::cout<<"warning candidate oesn't contain "<<v<<std::endl;
 	}*/
+	return false;
 }
 
 const std::vector<tValues>& Candidates::get(const tSquares sq) const {
-	assert(sq < squareNumber && sq > startSquare);
-	assert(v >= VALUE_1 && v <= VALUE_9);
-	
+	assert(sq < squareNumber && sq >= startSquare);
 	return _squares[sq];
 }
 
@@ -78,8 +78,7 @@ void Candidates::fillCandidates() {
 				) {
 					add(sq, v);
 				}
-			}
-				
+			}	
 		}
 	}
 }
@@ -88,24 +87,28 @@ void Candidates::print() const {
 	std::cout<<"INITIAL CANDIDITATES"<<std::endl;
 	
 	for (auto sq: squaresIterator::squares) {
+		if( sq <=9 )
 		if( _squares[sq].size() != 0 )
 		{
-			std::cout<<"candidates for square "<< sq + 1<<":";
-			for( auto v: _squares[sq] ) {
-				std::cout<<" "<<(v + 1)<<",";
-			}
-			std::cout<<std::endl;
+			std::cout<<"candidates for square "<< (sq + 1)<<":";
+			print(sq);
 		}
 	}
 }
 
-size_t Candidates::getSize(const tSquares sq) const
-{
+void Candidates::print(const tSquares sq) const {
+	
+	for( auto v: _squares[sq] ) {
+		std::cout<<(v + 1)<<", ";
+	}
+	std::cout<<std::endl;
+}
+
+size_t Candidates::getSize(const tSquares sq) const {
 	return get(sq).size();
 }
 
 bool Candidates::contains(const tSquares sq, tValues v) const {
 	const auto& values = get(sq);
-	return std::find(values.begin(), values.end(), v) != values.end();
-	
+	return std::find(values.begin(), values.end(), v) != values.end();	
 }

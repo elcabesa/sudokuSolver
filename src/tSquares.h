@@ -18,6 +18,8 @@
 #ifndef _TSQUARES_H
 #define _TSQUARES_H
 
+#include <vector>
+
 enum tRows {
 	ROW_A,
 	ROW_B,
@@ -82,6 +84,11 @@ tSquares getSquare(const tRows r, const tFiles f);
 tFiles getFile(const tSquares sq);
 tRows getRow(const tSquares sq);
 tBoxes getBox(const tSquares sq);
+
+bool areOnTheSameFile(std::vector<tSquares> s);
+bool areOnTheSameRow(std::vector<tSquares> s);
+bool areOnTheSameBox(std::vector<tSquares> s);
+
 
 //TODO add print for squares, file, row, box
 
