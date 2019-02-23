@@ -37,6 +37,8 @@ void Solver::solve() {
 		if (_findHiddenSingleInFile()) { _b.print(); continue; }
 		if (_findHiddenSingleInBox()) { _b.print(); continue; }
 		if (_findNakedPairInRow()) { _b.print(); continue; }
+		if (_findNakedPairInFile()) { _b.print(); continue; }
+		if (_findNakedPairInBox()) { _b.print(); continue; }
 		
 		std::cout<<"Done"<<std::endl;
 		break;
@@ -50,6 +52,12 @@ void Solver::_setSquareValue(const tSquares sq, const tValues v) {
 	assert(sq < squareNumber && sq >= startSquare);
 	assert(v >= VALUE_1 && v <= VALUE_9);
 	_b.setSquareValue(sq, v);
+	
+	auto c = _cand.get(sq);
+	
+	for (auto ca: c) {
+		_cand.remove(sq, ca);
+	}
 	
 	for (auto s: squaresIterator::files[getFile(sq)]) {
 		_cand.remove(s, v);
@@ -162,6 +170,82 @@ bool Solver::_findNakedPairInRow() {
 								// removed candidates from other squares in row
 								bool candidatesChanged = false;
 								for( const auto sq3: squaresIterator::rows[r]) {
+									if((sq3 != sq1) && (sq3 != sq2)) {
+										//remove candidates from other squares in row
+										for (auto v: pair) {
+											candidatesChanged |= _cand.remove(sq3, v);
+										}
+									}
+								}
+								if(candidatesChanged) {
+									return true;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool Solver::_findNakedPairInFile() {
+	for (const auto f: squaresIterator::file) {
+		for( const auto sq1: squaresIterator::files[f]) {
+			if (_cand.getSize(sq1) == 2) {
+				std::cout<<".found a pair at "<< sq1<<":";
+				_cand.print(sq1);
+				for( const auto sq2: squaresIterator::files[f]) {
+					if( sq2 != sq1 ) {
+						if (_cand.getSize(sq2) == 2) {
+							std::cout<<"..check candidate at "<< sq2 <<":";
+							_cand.print(sq2);
+							if (_cand.get(sq1) == _cand.get(sq2)) {
+								std::cout<<"...FOUND naked pair at "<< sq1 <<", "<< sq2 <<std::endl;
+								
+								auto pair = _cand.get(sq1);
+								// removed candidates from other squares in file
+								bool candidatesChanged = false;
+								for( const auto sq3: squaresIterator::files[f]) {
+									if((sq3 != sq1) && (sq3 != sq2)) {
+										//remove candidates from other squares in row
+										for (auto v: pair) {
+											candidatesChanged |= _cand.remove(sq3, v);
+										}
+									}
+								}
+								if(candidatesChanged) {
+									return true;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool Solver::_findNakedPairInBox() {
+	for (const auto b: squaresIterator::box) {
+		for( const auto sq1: squaresIterator::boxes[b]) {
+			if (_cand.getSize(sq1) == 2) {
+				std::cout<<".found a pair at "<< sq1<<":";
+				_cand.print(sq1);
+				for( const auto sq2: squaresIterator::boxes[b]) {
+					if( sq2 != sq1 ) {
+						if (_cand.getSize(sq2) == 2) {
+							std::cout<<"..check candidate at "<< sq2 <<":";
+							_cand.print(sq2);
+							if (_cand.get(sq1) == _cand.get(sq2)) {
+								std::cout<<"...FOUND naked pair at "<< sq1 <<", "<< sq2 <<std::endl;
+								
+								auto pair = _cand.get(sq1);
+								// removed candidates from other squares in box
+								bool candidatesChanged = false;
+								for( const auto sq3: squaresIterator::boxes[b]) {
 									if((sq3 != sq1) && (sq3 != sq2)) {
 										//remove candidates from other squares in row
 										for (auto v: pair) {

@@ -38,6 +38,9 @@ private:
 	bool _findHiddenSingleInBox();
 	
 	bool _findNakedPairInRow();
+	bool _findNakedPairInFile();
+	bool _findNakedPairInBox();
+	
 	void _setSquareValue(const tSquares t, const tValues v);
 };
 

@@ -87,7 +87,6 @@ void Candidates::print() const {
 	std::cout<<"INITIAL CANDIDITATES"<<std::endl;
 	
 	for (auto sq: squaresIterator::squares) {
-		if( sq <=9 )
 		if( _squares[sq].size() != 0 )
 		{
 			std::cout<<"candidates for square "<< sq <<": ";
