@@ -36,10 +36,15 @@ private:
 	bool _findHiddenSingleInRow();
 	bool _findHiddenSingleInFile();
 	bool _findHiddenSingleInBox();
+	template <class IT, class IT2>
+	bool _findHiddenSingleIn(IT it, IT2 it2);
 	
 	bool _findNakedPairInRow();
 	bool _findNakedPairInFile();
 	bool _findNakedPairInBox();
+	template <class IT, class IT2>
+	bool _findNakedPairIn(IT it, IT2 it2);
+	
 	
 	void _setSquareValue(const tSquares t, const tValues v);
 };
