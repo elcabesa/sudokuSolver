@@ -28,8 +28,43 @@ int main() {
 	printStartInfo();
 	
 	Board b;
+	
+	b.setSquareValue(B2, VALUE_8);
+	b.setSquareValue(B3, VALUE_1);
+	b.setSquareValue(B4, VALUE_4);
+	b.setSquareValue(B6, VALUE_9);
+	b.setSquareValue(B7, VALUE_5);
+	b.setSquareValue(B8, VALUE_6);
+	
+	b.setSquareValue(C1, VALUE_7);
+	b.setSquareValue(C3, VALUE_6);
+	b.setSquareValue(C4, VALUE_5);
+	b.setSquareValue(C6, VALUE_3);
+	b.setSquareValue(C7, VALUE_8);
+	b.setSquareValue(C9, VALUE_4);
+	
+	b.setSquareValue(D2, VALUE_4);
+	b.setSquareValue(D3, VALUE_2);
+	b.setSquareValue(D7, VALUE_7);
+	b.setSquareValue(D8, VALUE_1);
+	
+	b.setSquareValue(E4, VALUE_7);
+	b.setSquareValue(E6, VALUE_6);
+	
+	b.setSquareValue(F3, VALUE_8);
+	b.setSquareValue(F7, VALUE_2);
+	
+	b.setSquareValue(G4, VALUE_3);
+	b.setSquareValue(G6, VALUE_7);
+	
+	b.setSquareValue(H1, VALUE_8);
+	b.setSquareValue(H5, VALUE_6);
+	b.setSquareValue(H9, VALUE_1);
+	
+	b.setSquareValue(I2, VALUE_3);
+	b.setSquareValue(I8, VALUE_7);
 		
-	b.setSquareValue(A2, VALUE_5);
+	/*b.setSquareValue(A2, VALUE_5);
 	b.setSquareValue(A3, VALUE_8);
 	b.setSquareValue(A4, VALUE_1);
 	b.setSquareValue(A8, VALUE_4);
@@ -66,7 +101,7 @@ int main() {
 	b.setSquareValue(H6, VALUE_6);
 	b.setSquareValue(H7, VALUE_1);
 	
-	b.setSquareValue(I6, VALUE_1);
+	b.setSquareValue(I6, VALUE_1);*/
 	Solver s(b);
 	s.solve();
 	

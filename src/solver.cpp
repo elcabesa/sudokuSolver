@@ -15,6 +15,7 @@
     along with SudokuSolver.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <bitset>
 #include <cassert>
 #include <iostream>
 
@@ -30,21 +31,21 @@ void Solver::solve() {
 	_b.print();
 	do {
 		
-		_cand.print();
-		std::cout<<"Performing STEP..."<<std::endl;
-		if (_findSingle()) { _b.print(); continue; }
-		if (_findHiddenSingleInRow()) { _b.print(); continue; }
-		if (_findHiddenSingleInFile()) { _b.print(); continue; }
-		if (_findHiddenSingleInBox()) { _b.print(); continue; }
-		if (_findNakedPairInRow()) { _b.print(); continue; }
-		if (_findNakedPairInFile()) { _b.print(); continue; }
-		if (_findNakedPairInBox()) { _b.print(); continue; }
+		//_cand.print();
+		//std::cout<<"Performing STEP..."<<std::endl;
+		if (_findSingle()) { /*_b.print();*/ continue; }
+		if (_findHiddenSingleInRow()) { /*_b.print();*/ continue; }
+		if (_findHiddenSingleInFile()) { /*_b.print();*/ continue; }
+		if (_findHiddenSingleInBox()) { /*_b.print();*/ continue; }
+		if (_findNakedInRow()) { /*_b.print();*/ continue; }
+		if (_findNakedInFile()) { /*_b.print();*/ continue; }
+		if (_findNakedInBox()) { /*_b.print();*/ continue; }
 		
 		std::cout<<"Done"<<std::endl;
 		break;
 	}
-	
-	while (std::cin.ignore());
+	while (true/*std::cin.ignore()*/);
+	_b.print();
 	
 }
 
@@ -74,11 +75,11 @@ void Solver::_setSquareValue(const tSquares sq, const tValues v) {
 }
 
 bool Solver::_findSingle() {
-	std::cout<<"Searching for solved cells..."<<std::endl;
+	//std::cout<<"Searching for solved cells..."<<std::endl;
 	for (auto sq: squaresIterator::squares) {
 		if (_cand.getSize(sq) == 1) {
 			auto v = _cand.get(sq)[0];
-			std::cout<<"...Found at "<< sq <<" value "<< v << std::endl;
+			std::cout<<"...Found single at "<< sq <<" value "<< v << std::endl;
 			_setSquareValue(sq, v);
 			return true;
 		}
@@ -88,7 +89,7 @@ bool Solver::_findSingle() {
 
 template <class IT, class IT2>
 bool Solver::_findHiddenSingleIn(IT it, IT2 it2) {
-	std::cout<<"Searching for hidden single..."<<std::endl;
+	
 	for (const auto r: it) {
 		for (const auto v: squaresIterator::value) {
 			unsigned int count = 0;
@@ -100,7 +101,7 @@ bool Solver::_findHiddenSingleIn(IT it, IT2 it2) {
 				}
 			}
 			if (count == 1) {
-				std::cout<<"...Found at "<< singleSq <<" value "<< v << std::endl;
+				std::cout<<"...Found hidden single at "<< singleSq <<" value "<< v << std::endl;
 				_setSquareValue(singleSq, v);
 				return true;
 			}				
@@ -110,69 +111,123 @@ bool Solver::_findHiddenSingleIn(IT it, IT2 it2) {
 }
 
 bool Solver::_findHiddenSingleInRow() {
+	//std::cout<<"Searching for hidden single in rows"<<std::endl;
 	return _findHiddenSingleIn<std::array<tRows, rowNumber>, std::array<std::vector<tSquares>, rowNumber>>(squaresIterator::row, squaresIterator::rows);
 }
 
 bool Solver::_findHiddenSingleInFile() {
+	//std::cout<<"Searching for hidden single in files"<<std::endl;
 	return _findHiddenSingleIn<std::array<tFiles, fileNumber>, std::array<std::vector<tSquares>, fileNumber>>(squaresIterator::file, squaresIterator::files);
 }
 
 bool Solver::_findHiddenSingleInBox() {
+	//std::cout<<"Searching for hidden single boxes"<<std::endl;
 	return _findHiddenSingleIn<std::array<tBoxes, boxNumber>, std::array<std::vector<tSquares>, boxNumber>>(squaresIterator::box, squaresIterator::boxes);
 }
 
+template <class type>
+std::vector<type> Solver::_getListFromBitset(const unsigned int n, std::vector<type> vec) const {
+	//convert in a list of index
+	std::bitset<9> bs(n);
+	//get list of squares
+	std::vector<type> sqList;
+			
+	for (std::size_t idx = 0; idx < bs.size(); ++idx) {
+		if (bs[idx] != 0) {
+			sqList.push_back(vec[idx]);
+		}
+	}
+	return sqList;
+}
+
+bool Solver::_containSolvedCell(std::vector<tSquares> vec) const {
+	bool containsSolvedCells = false;
+	for (auto sq: vec) {
+		if( _b.getSquareValue(sq) != VALUE_NONE) {containsSolvedCells = true;}
+	}
+	return containsSolvedCells;
+}
+
+std::set<tValues> Solver::_createUnionOfValuesFromCell(std::vector<tSquares> sqList) const {
+	std::set<tValues> groupValues;
+	for (auto sq: sqList) {
+		auto& cand = _cand.get(sq);
+		for (auto v: cand ) {
+			groupValues.insert(v);
+		}
+	}
+	return groupValues;
+}
+
+bool Solver::_removeCandidatesFromCell(const tSquares sq, std::set<tValues> groupValues) {
+	bool candidatesChanged = false;
+	for (auto v: groupValues) {
+		candidatesChanged |= _cand.remove(sq, v);
+	}
+	return candidatesChanged;
+}
+
 template <class IT, class IT2>
-bool Solver::_findNakedPairIn(IT it, IT2 it2) {
+bool Solver::_findNakedIn(IT it, IT2 it2) {
 	
-	// todo rewrite.... don't search pairs, but generalize and search groups, 
-	// todo don't search for sq1 and sq2, but get values at sq1 and then search following squares compatibles, it at the end you found group size == biggestCandNumber -> found naked pair, triple, quartet...
 	for (const auto b: it) {
-		for( const auto sq1: it2[b]) {
-			if (_cand.getSize(sq1) == 2) {
-				std::cout<<".found a pair at "<< sq1<<":";
-				_cand.print(sq1);
-				for( const auto sq2: it2[b]) {
-					if( sq2 != sq1 ) {
-						if (_cand.getSize(sq2) == 2) {
-							std::cout<<"..check candidate at "<< sq2 <<":";
-							_cand.print(sq2);
-							if (_cand.get(sq1) == _cand.get(sq2)) {
-								std::cout<<"...FOUND naked pair at "<< sq1 <<", "<< sq2 <<std::endl;
-								
-								auto pair = _cand.get(sq1);
-								// removed candidates from other squares
-								bool candidatesChanged = false;
-								for( const auto sq3: it2[b]) {
-									if((sq3 != sq1) && (sq3 != sq2)) {
-										//remove candidates from other squares in row
-										for (auto v: pair) {
-											candidatesChanged |= _cand.remove(sq3, v);
-										}
-									}
-								}
-								if(candidatesChanged) {
-									return true;
-								}
-							}
+		
+		// for all combiantion of 9 squares
+		for (unsigned int n = 0; n < 512; ++n) {
+			
+			//convert bitset to vector of squares
+			auto sqList = _getListFromBitset<tSquares>(n, it2[b]);
+			
+			//check that the combination doesn't contain solved cells
+			if (!_containSolvedCell(sqList)) {
+				
+				// for the list of cells create the union of values
+				auto groupValues = _createUnionOfValuesFromCell(sqList);
+				
+				// if the number of different values in the group is equal to thee number of squares in the bitset we have found a nake set
+				if (sqList.size() == groupValues.size()) {
+					// found a nake group. let's try so simplify
+					// todo print naked group and values
+					
+					bool candidatesChanged = false;
+					
+					// for all the squares outside sqList
+					for ( const auto sq: it2[b]) {
+						if (std::find(sqList.begin(), sqList.end(), sq) == sqList.end()) {
+							candidatesChanged |= _removeCandidatesFromCell(sq, groupValues);
 						}
 					}
+					if(candidatesChanged) {
+						std::cout<<"...FOUND naked group at ";
+						for (auto sq:sqList) {
+							std::cout<< sq <<", ";
+						}
+						std::cout<<std::endl;
+						std::cout<<"values ";
+						for (auto v: groupValues) {
+							std::cout<< v <<", ";
+						}
+						std::cout<<std::endl;
+						return true;
+					}
 				}
-			}
+			}	
 		}
 	}
 	return false;
 }
 
-
-
-bool Solver::_findNakedPairInRow() {
-	return _findNakedPairIn<std::array<tRows, rowNumber>, std::array<std::vector<tSquares>, rowNumber>>(squaresIterator::row, squaresIterator::rows);
+bool Solver::_findNakedInRow() {
+	//std::cout<<"Searching for naked in rows"<<std::endl;
+	return _findNakedIn<std::array<tRows, rowNumber>, std::array<std::vector<tSquares>, rowNumber>>(squaresIterator::row, squaresIterator::rows);
 }
 
-bool Solver::_findNakedPairInFile() {
-	return _findNakedPairIn<std::array<tFiles, fileNumber>, std::array<std::vector<tSquares>, fileNumber>>(squaresIterator::file, squaresIterator::files);
+bool Solver::_findNakedInFile() {
+	//std::cout<<"Searching for naked in files"<<std::endl;
+	return _findNakedIn<std::array<tFiles, fileNumber>, std::array<std::vector<tSquares>, fileNumber>>(squaresIterator::file, squaresIterator::files);
 }
 
-bool Solver::_findNakedPairInBox() {
-	return _findNakedPairIn<std::array<tBoxes, boxNumber>, std::array<std::vector<tSquares>, boxNumber>>(squaresIterator::box, squaresIterator::boxes);
+bool Solver::_findNakedInBox() {
+	//std::cout<<"Searching for naked in boxes"<<std::endl;
+	return _findNakedIn<std::array<tBoxes, boxNumber>, std::array<std::vector<tSquares>, boxNumber>>(squaresIterator::box, squaresIterator::boxes);
 }

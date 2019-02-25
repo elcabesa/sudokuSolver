@@ -18,6 +18,8 @@
 #ifndef _SOLVER_H
 #define _SOLVER_H
 
+#include <set>
+
 #include "Candidates.h"
 #include "value.h"
 
@@ -36,17 +38,29 @@ private:
 	bool _findHiddenSingleInRow();
 	bool _findHiddenSingleInFile();
 	bool _findHiddenSingleInBox();
+	
 	template <class IT, class IT2>
 	bool _findHiddenSingleIn(IT it, IT2 it2);
 	
-	bool _findNakedPairInRow();
-	bool _findNakedPairInFile();
-	bool _findNakedPairInBox();
+	
 	template <class IT, class IT2>
-	bool _findNakedPairIn(IT it, IT2 it2);
+	bool _findNakedIn(IT it, IT2 it2);
+	
+	bool _findNakedInRow();
+	bool _findNakedInFile();
+	bool _findNakedInBox();
 	
 	
 	void _setSquareValue(const tSquares t, const tValues v);
+	
+	template <class type>
+	std::vector<type> _getListFromBitset(const unsigned int n, std::vector<type> vec) const;
+	
+	bool _containSolvedCell(std::vector<tSquares> vec) const;
+	
+	std::set<tValues> _createUnionOfValuesFromCell(std::vector<tSquares> sqList) const;
+	
+	bool _removeCandidatesFromCell(const tSquares sq, std::set<tValues> groupValues);
 };
 
 #endif
