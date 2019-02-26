@@ -40,6 +40,9 @@ void Solver::solve() {
 		if (_findNakedInRow()) { /*_b.print();*/ continue; }
 		if (_findNakedInFile()) { /*_b.print();*/ continue; }
 		if (_findNakedInBox()) { /*_b.print();*/ continue; }
+		if (_findHiddenInRow()) { /*_b.print();*/ continue; }
+		if (_findHiddenInFile()) { /*_b.print();*/ continue; }
+		if (_findHiddenInBox()) { /*_b.print();*/ continue; }
 		
 		std::cout<<"Done"<<std::endl;
 		break;
@@ -187,7 +190,6 @@ bool Solver::_findNakedIn(IT it, IT2 it2) {
 				// if the number of different values in the group is equal to thee number of squares in the bitset we have found a nake set
 				if (sqList.size() == groupValues.size()) {
 					// found a nake group. let's try so simplify
-					// todo print naked group and values
 					
 					bool candidatesChanged = false;
 					
@@ -230,4 +232,81 @@ bool Solver::_findNakedInFile() {
 bool Solver::_findNakedInBox() {
 	//std::cout<<"Searching for naked in boxes"<<std::endl;
 	return _findNakedIn<std::array<tBoxes, boxNumber>, std::array<std::vector<tSquares>, boxNumber>>(squaresIterator::box, squaresIterator::boxes);
+}
+
+
+template <class IT, class IT2>
+bool Solver::_findHiddenIn(IT it, IT2 it2) {
+	
+	// for all the units
+	for (const auto b: it) {
+		
+		// for all combiantion of 9 values
+		for (unsigned int n = 0; n < 512; ++n) {
+			
+			//convert bitset to vector of values
+			std::vector<tValues> temp(squaresIterator::value.begin(), squaresIterator::value.end());
+			auto valueList = _getListFromBitset<tValues>(n, temp);
+			
+			std::vector<tSquares> sqList;
+			
+			//get squareList containing the values in candidates
+			for (auto sq: it2[b]) {
+				auto cand = _cand.get(sq);
+				
+				bool good = true;
+				for (auto v: valueList) {
+					if (std::find(cand.begin(),cand.end(),v) == cand.end()) {
+						good = false;
+					}
+				}
+				if (good) {
+					sqList.push_back(sq);
+				}
+			}
+				
+			if (sqList.size() == valueList.size()) {
+				// found a hidden group. let's try so simplify
+				
+				bool candidatesChanged = false;
+				
+				// for all the squares outside sqList
+				for ( const auto sq: it2[b]) {
+					if (std::find(sqList.begin(), sqList.end(), sq) == sqList.end()) {
+						std::set<tValues> temp(valueList.begin(),valueList.end());
+						candidatesChanged |= _removeCandidatesFromCell(sq, temp);
+					}
+				}
+				if(candidatesChanged) {
+					std::cout<<"...FOUND hidden group at ";
+					for (auto sq:sqList) {
+						std::cout<< sq <<", ";
+					}
+					std::cout<<std::endl;
+					std::cout<<"values ";
+					for (auto v: valueList) {
+						std::cout<< v <<", ";
+					}
+					std::cout<<std::endl;
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool Solver::_findHiddenInRow() {
+	//std::cout<<"Searching for hidden in rows"<<std::endl;
+	return _findHiddenIn<std::array<tRows, rowNumber>, std::array<std::vector<tSquares>, rowNumber>>(squaresIterator::row, squaresIterator::rows);
+}
+
+bool Solver::_findHiddenInFile() {
+	//std::cout<<"Searching for hidden in files"<<std::endl;
+	return _findHiddenIn<std::array<tFiles, fileNumber>, std::array<std::vector<tSquares>, fileNumber>>(squaresIterator::file, squaresIterator::files);
+}
+
+bool Solver::_findHiddenInBox() {
+	//std::cout<<"Searching for hidden in boxes"<<std::endl;
+	return _findHiddenIn<std::array<tBoxes, boxNumber>, std::array<std::vector<tSquares>, boxNumber>>(squaresIterator::box, squaresIterator::boxes);
 }

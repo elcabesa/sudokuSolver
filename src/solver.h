@@ -61,6 +61,13 @@ private:
 	std::set<tValues> _createUnionOfValuesFromCell(std::vector<tSquares> sqList) const;
 	
 	bool _removeCandidatesFromCell(const tSquares sq, std::set<tValues> groupValues);
+	
+	template <class IT, class IT2>
+	bool _findHiddenIn(IT it, IT2 it2);
+	
+	bool _findHiddenInRow();
+	bool _findHiddenInFile();
+	bool _findHiddenInBox();
 };
 
 #endif
