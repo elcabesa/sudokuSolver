@@ -74,6 +74,9 @@ private:
 	
 	bool _findPointingPairInRow();
 	bool _findPointingPairInFile();
+
+	bool _findBoxLineForRow();
+	bool _findBoxLineForFile();
 	
 	
 };

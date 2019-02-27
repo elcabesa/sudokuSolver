@@ -46,6 +46,8 @@ void Solver::solve() {
 		if (_findHiddenInBox()) { /*_b.print();*/ continue; }
 		if (_findPointingPairInRow()) { /*_b.print();*/ continue; }
 		if (_findPointingPairInFile()) { /*_b.print();*/ continue; }
+		if (_findBoxLineForRow()) { /*_b.print();*/ continue; }
+		if (_findBoxLineForFile()) { /*_b.print();*/ continue; }
 		
 		std::cout<<"Done"<<std::endl;
 		break;
@@ -329,7 +331,7 @@ bool Solver::_findPointingPairIn(IT it, IT2 it2) {
 				}
 			}
 			
-			if (tBoxes b = areOnTheSameBox(squareList); b != BOX_NONE ) {
+			if (auto b = areOnTheSameBox(squareList); b != BOX_NONE ) {
 				bool modified = false;
 				// you can remove the value from all other squares in the box
 				for (auto sq: squaresIterator::boxes[b]) { 
@@ -358,4 +360,76 @@ bool Solver::_findPointingPairInRow() {
 }
 bool Solver::_findPointingPairInFile() {
 	return _findPointingPairIn<std::array<tFiles, fileNumber>, std::array<std::vector<tSquares>, fileNumber>>(squaresIterator::file, squaresIterator::files);
+}
+
+
+bool Solver::_findBoxLineForRow() {
+	// for all boxes
+	for (const auto b: squaresIterator::box) {
+		// for all the values
+		for(auto v: squaresIterator::value) {
+			// find all the squares containing value as candidate
+			std::vector<tSquares> squareList;
+			for(auto sq: squaresIterator::boxes[b]) {
+				if (_cand.contains(sq, v)) {
+					squareList.push_back(sq);
+				}
+			}
+			
+			if (auto b = areOnTheSameRow(squareList); b != ROW_NONE ) {
+				bool modified = false;
+				// you can remove the value from all other squares in the box
+				for (auto sq: squaresIterator::rows[b]) { 
+					if (std::find(squareList.begin(), squareList.end(), sq) == squareList.end()) {
+						modified |= _cand.remove(sq, v);
+					}
+				}
+				if (modified) {
+					std::cout<<"...FOUND box line reduction at ";
+					for (auto sq: squareList) {
+						std::cout<< sq <<", ";
+					}
+					std::cout<<std::endl;
+					std::cout<<"value: "<< v<<std::endl;
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+bool Solver::_findBoxLineForFile() {
+	// for all boxes
+	for (const auto b: squaresIterator::box) {
+		// for all the values
+		for(auto v: squaresIterator::value) {
+			// find all the squares containing value as candidate
+			std::vector<tSquares> squareList;
+			for(auto sq: squaresIterator::boxes[b]) {
+				if (_cand.contains(sq, v)) {
+					squareList.push_back(sq);
+				}
+			}
+			
+			if (auto b = areOnTheSameFile(squareList); b != FILE_NONE ) {
+				bool modified = false;
+				// you can remove the value from all other squares in the box
+				for (auto sq: squaresIterator::files[b]) { 
+					if (std::find(squareList.begin(), squareList.end(), sq) == squareList.end()) {
+						modified |= _cand.remove(sq, v);
+					}
+				}
+				if (modified) {
+					std::cout<<"...FOUND box line reduction at ";
+					for (auto sq: squareList) {
+						std::cout<< sq <<", ";
+					}
+					std::cout<<std::endl;
+					std::cout<<"value: "<< v<<std::endl;
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }
