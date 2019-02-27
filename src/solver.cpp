@@ -28,10 +28,11 @@ Solver::Solver(Board& b): _b(b), _cand(b){}
 
 void Solver::solve() {
 	_cand.fillCandidates();
+	_cand.print();
 	_b.print();
 	do {
 		
-		//_cand.print();
+		_cand.print();
 		//std::cout<<"Performing STEP..."<<std::endl;
 		if (_findSingle()) { /*_b.print();*/ continue; }
 		if (_findHiddenSingleInRow()) { /*_b.print();*/ continue; }
@@ -47,7 +48,7 @@ void Solver::solve() {
 		std::cout<<"Done"<<std::endl;
 		break;
 	}
-	while (true/*std::cin.ignore()*/);
+	while (std::cin.ignore());
 	_b.print();
 	
 }
@@ -250,36 +251,36 @@ bool Solver::_findHiddenIn(IT it, IT2 it2) {
 			
 			std::vector<tSquares> sqList;
 			
-			//get squareList containing the values in candidates
+			//get squareList not solved and non containing any of the values in candidates
+			std::set<tValues> foundValues;
 			for (auto sq: it2[b]) {
 				auto cand = _cand.get(sq);
-				
-				bool good = true;
+				bool contain = false;
 				for (auto v: valueList) {
-					if (std::find(cand.begin(),cand.end(),v) == cand.end()) {
-						good = false;
+					if (std::find(cand.begin(),cand.end(),v) != cand.end()) {
+						contain = true;
+						foundValues.insert(v);
 					}
 				}
-				if (good) {
+				if (contain) {
 					sqList.push_back(sq);
 				}
 			}
 				
-			if (sqList.size() == valueList.size()) {
+			if (sqList.size() == valueList.size() && sqList.size() != 0 && foundValues.size() == valueList.size()) {
 				// found a hidden group. let's try so simplify
-				
-				bool candidatesChanged = false;
-				
-				// for all the squares outside sqList
-				for ( const auto sq: it2[b]) {
-					if (std::find(sqList.begin(), sqList.end(), sq) == sqList.end()) {
-						std::set<tValues> temp(valueList.begin(),valueList.end());
-						candidatesChanged |= _removeCandidatesFromCell(sq, temp);
+				bool modified = false;
+				for (auto sq: sqList) {
+					for(auto v: squaresIterator::value) {
+						if (std::find(valueList.begin(), valueList.end(), v) == valueList.end()) {
+							// todo manage cand remo
+							modified |= _cand.remove(sq, v);
+						}
 					}
 				}
-				if(candidatesChanged) {
+				if (modified) {
 					std::cout<<"...FOUND hidden group at ";
-					for (auto sq:sqList) {
+					for (auto sq: sqList) {
 						std::cout<< sq <<", ";
 					}
 					std::cout<<std::endl;
@@ -290,6 +291,7 @@ bool Solver::_findHiddenIn(IT it, IT2 it2) {
 					std::cout<<std::endl;
 					return true;
 				}
+				
 			}
 		}
 	}
@@ -297,16 +299,16 @@ bool Solver::_findHiddenIn(IT it, IT2 it2) {
 }
 
 bool Solver::_findHiddenInRow() {
-	//std::cout<<"Searching for hidden in rows"<<std::endl;
+	std::cout<<"Searching for hidden in rows"<<std::endl;
 	return _findHiddenIn<std::array<tRows, rowNumber>, std::array<std::vector<tSquares>, rowNumber>>(squaresIterator::row, squaresIterator::rows);
 }
 
 bool Solver::_findHiddenInFile() {
-	//std::cout<<"Searching for hidden in files"<<std::endl;
+	std::cout<<"Searching for hidden in files"<<std::endl;
 	return _findHiddenIn<std::array<tFiles, fileNumber>, std::array<std::vector<tSquares>, fileNumber>>(squaresIterator::file, squaresIterator::files);
 }
 
 bool Solver::_findHiddenInBox() {
-	//std::cout<<"Searching for hidden in boxes"<<std::endl;
+	std::cout<<"Searching for hidden in boxes"<<std::endl;
 	return _findHiddenIn<std::array<tBoxes, boxNumber>, std::array<std::vector<tSquares>, boxNumber>>(squaresIterator::box, squaresIterator::boxes);
 }
