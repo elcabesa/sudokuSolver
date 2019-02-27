@@ -29,7 +29,34 @@ int main() {
 	
 	Board b;
 	
-	b.setSquareValue(B1, VALUE_9);
+	b.setSquareValue(A1, VALUE_4);
+	b.setSquareValue(A5, VALUE_1);
+	b.setSquareValue(B4, VALUE_3);
+	b.setSquareValue(B6, VALUE_9);
+	b.setSquareValue(B8, VALUE_4);
+	b.setSquareValue(C2, VALUE_7);
+	b.setSquareValue(C6, VALUE_5);
+	b.setSquareValue(C9, VALUE_9);
+	b.setSquareValue(D5, VALUE_6);
+	b.setSquareValue(D8, VALUE_2);
+	b.setSquareValue(D9, VALUE_1);
+	b.setSquareValue(E3, VALUE_4);
+	b.setSquareValue(E5, VALUE_7);
+	b.setSquareValue(E7, VALUE_6);
+	b.setSquareValue(F1, VALUE_1);
+	b.setSquareValue(F2, VALUE_9);
+	b.setSquareValue(F5, VALUE_5);
+	b.setSquareValue(G1, VALUE_9);
+	b.setSquareValue(G4, VALUE_4);
+	b.setSquareValue(G8, VALUE_7);
+	b.setSquareValue(H2, VALUE_3);
+	b.setSquareValue(H4, VALUE_6);
+	b.setSquareValue(H6, VALUE_8);
+	b.setSquareValue(I5, VALUE_3);
+	b.setSquareValue(I9, VALUE_6);
+	
+	
+/*	b.setSquareValue(B1, VALUE_9);
 	b.setSquareValue(B3, VALUE_4);
 	b.setSquareValue(B4, VALUE_6);
 	b.setSquareValue(B6, VALUE_7);
@@ -62,7 +89,7 @@ int main() {
 	b.setSquareValue(H4, VALUE_4);
 	b.setSquareValue(H6, VALUE_3);
 	b.setSquareValue(H7, VALUE_2);
-	b.setSquareValue(H8, VALUE_8);
+	b.setSquareValue(H8, VALUE_8);*/
 	
 	/*b.setSquareValue(B2, VALUE_8);
 	b.setSquareValue(B3, VALUE_1);

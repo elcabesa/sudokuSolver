@@ -32,7 +32,7 @@ void Solver::solve() {
 	_b.print();
 	do {
 		
-		_cand.print();
+		//_cand.print();
 		//std::cout<<"Performing STEP..."<<std::endl;
 		if (_findSingle()) { /*_b.print();*/ continue; }
 		if (_findHiddenSingleInRow()) { /*_b.print();*/ continue; }

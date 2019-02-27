@@ -36,41 +36,42 @@ tBoxes getBox(const tSquares sq) {
 	return static_cast<tBoxes>((3 * (getRow(sq) / 3)) + (getFile(sq) / 3));
 }
 
-bool areOnTheSameFile(std::vector<tSquares> s) {
+tFiles areOnTheSameFile(std::vector<tSquares> s) {
 	if (s.empty()) {
-		return false;
+		return FILE_NONE;
 	}
 	const auto ref = getFile(s[0]);
 	for (auto sq: s) {
 		if (getFile(sq) != ref) {
-			return false;
+			return FILE_NONE;
 		}
 	}
-	return true;
+	return ref;
 }
-bool areOnTheSameRow(std::vector<tSquares> s) {
+tRows areOnTheSameRow(std::vector<tSquares> s) {
 	if (s.empty()) {
-		return false;
+		return ROW_NONE;
 	}
 	const auto ref = getRow(s[0]);
 	for (auto sq: s) {
 		if (getRow(sq) != ref) {
-			return false;
+			return ROW_NONE;
 		}
 	}
-	return true;
+	return ref;
 }
-bool areOnTheSameBox(std::vector<tSquares> s) {
+
+tBoxes areOnTheSameBox(std::vector<tSquares> s) {
 	if (s.empty()) {
-		return false;
+		return BOX_NONE;
 	}
 	const auto ref = getBox(s[0]);
 	for (auto sq: s) {
 		if (getBox(sq) != ref) {
-			return false;
+			return BOX_NONE;
 		}
 	}
-	return true;
+	return ref;
 }
 
 std::ostream& operator <<(std::ostream& stream, const tRows& r) {

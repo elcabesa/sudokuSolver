@@ -32,7 +32,8 @@ enum tRows {
 	ROW_H,
 	ROW_I,
 	rowNumber,
-	startRow = 0
+	startRow = 0,
+	ROW_NONE = -1
 };
 
 enum tFiles {
@@ -46,7 +47,8 @@ enum tFiles {
 	FILE_8,
 	FILE_9,
 	fileNumber,
-	startFile = 0
+	startFile = 0,
+	FILE_NONE = -1
 };
 
 enum tBoxes {
@@ -60,7 +62,8 @@ enum tBoxes {
 	BOX_8,
 	BOX_9,
 	boxNumber,
-	startBox = 0
+	startBox = 0,
+	BOX_NONE = -1
 };
 
 enum tSquares {
@@ -86,9 +89,9 @@ tFiles getFile(const tSquares sq);
 tRows getRow(const tSquares sq);
 tBoxes getBox(const tSquares sq);
 
-bool areOnTheSameFile(std::vector<tSquares> s);
-bool areOnTheSameRow(std::vector<tSquares> s);
-bool areOnTheSameBox(std::vector<tSquares> s);
+tFiles areOnTheSameFile(std::vector<tSquares> s);
+tRows areOnTheSameRow(std::vector<tSquares> s);
+tBoxes areOnTheSameBox(std::vector<tSquares> s);
 
 
 std::ostream& operator <<(std::ostream& stream, const tRows& v);
