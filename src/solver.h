@@ -68,6 +68,14 @@ private:
 	bool _findHiddenInRow();
 	bool _findHiddenInFile();
 	bool _findHiddenInBox();
+	
+	template <class IT, class IT2>
+	bool _findPointingPairIn(IT it, IT2 it2);
+	
+	bool _findPointingPairInRow();
+	bool _findPointingPairInFile();
+	
+	
 };
 
 #endif

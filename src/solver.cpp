@@ -28,11 +28,11 @@ Solver::Solver(Board& b): _b(b), _cand(b){}
 
 void Solver::solve() {
 	_cand.fillCandidates();
-	_cand.print();
-	_b.print();
+	//_cand.print();
+	//_b.print();
 	do {
-		
-		//_cand.print();
+		_b.print();
+		_cand.print();
 		//std::cout<<"Performing STEP..."<<std::endl;
 		if (_findSingle()) { /*_b.print();*/ continue; }
 		if (_findHiddenSingleInRow()) { /*_b.print();*/ continue; }
@@ -44,6 +44,8 @@ void Solver::solve() {
 		if (_findHiddenInRow()) { /*_b.print();*/ continue; }
 		if (_findHiddenInFile()) { /*_b.print();*/ continue; }
 		if (_findHiddenInBox()) { /*_b.print();*/ continue; }
+		if (_findPointingPairInRow()) { /*_b.print();*/ continue; }
+		if (_findPointingPairInFile()) { /*_b.print();*/ continue; }
 		
 		std::cout<<"Done"<<std::endl;
 		break;
@@ -299,16 +301,61 @@ bool Solver::_findHiddenIn(IT it, IT2 it2) {
 }
 
 bool Solver::_findHiddenInRow() {
-	std::cout<<"Searching for hidden in rows"<<std::endl;
+	//std::cout<<"Searching for hidden in rows"<<std::endl;
 	return _findHiddenIn<std::array<tRows, rowNumber>, std::array<std::vector<tSquares>, rowNumber>>(squaresIterator::row, squaresIterator::rows);
 }
 
 bool Solver::_findHiddenInFile() {
-	std::cout<<"Searching for hidden in files"<<std::endl;
+	//std::cout<<"Searching for hidden in files"<<std::endl;
 	return _findHiddenIn<std::array<tFiles, fileNumber>, std::array<std::vector<tSquares>, fileNumber>>(squaresIterator::file, squaresIterator::files);
 }
 
 bool Solver::_findHiddenInBox() {
-	std::cout<<"Searching for hidden in boxes"<<std::endl;
+	//std::cout<<"Searching for hidden in boxes"<<std::endl;
 	return _findHiddenIn<std::array<tBoxes, boxNumber>, std::array<std::vector<tSquares>, boxNumber>>(squaresIterator::box, squaresIterator::boxes);
+}
+
+template <class IT, class IT2>
+bool Solver::_findPointingPairIn(IT it, IT2 it2) {
+	// for all the units
+	for (const auto b: it) {
+		// for all the values
+		for(auto v: squaresIterator::value) {
+			// find all the squares containing value as candidate
+			std::vector<tSquares> squareList;
+			for(auto sq: it2[b]) {
+				if (_cand.contains(sq, v)) {
+					squareList.push_back(sq);
+				}
+			}
+			
+			if (tBoxes b = areOnTheSameBox(squareList); b != BOX_NONE ) {
+				bool modified = false;
+				// you can remove the value from all other squares in the box
+				for (auto sq: squaresIterator::boxes[b]) { 
+					if (std::find(squareList.begin(), squareList.end(), sq) == squareList.end()) {
+						modified |= _cand.remove(sq, v);
+					}
+				}
+				if (modified) {
+					std::cout<<"...FOUND pointing pair at ";
+					for (auto sq: squareList) {
+						std::cout<< sq <<", ";
+					}
+					std::cout<<std::endl;
+					std::cout<<"value: "<< v<<std::endl;
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+		
+}
+
+bool Solver::_findPointingPairInRow() {
+	return _findPointingPairIn<std::array<tRows, rowNumber>, std::array<std::vector<tSquares>, rowNumber>>(squaresIterator::row, squaresIterator::rows);
+}
+bool Solver::_findPointingPairInFile() {
+	return _findPointingPairIn<std::array<tFiles, fileNumber>, std::array<std::vector<tSquares>, fileNumber>>(squaresIterator::file, squaresIterator::files);
 }
