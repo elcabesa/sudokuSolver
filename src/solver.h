@@ -19,6 +19,7 @@
 #define _SOLVER_H
 
 #include <set>
+#include <string>
 
 #include "Candidates.h"
 #include "value.h"
@@ -32,6 +33,8 @@ public:
 private:
 	Board& _b;
 	Candidates _cand;
+	
+	void _printInfo(std::string type, std::vector<tSquares> sqList, std::vector<tValues> vList ) const;
 	
 	bool _findSingle();
 	
@@ -77,7 +80,6 @@ private:
 
 	bool _findBoxLineForRow();
 	bool _findBoxLineForFile();
-	
 	
 };
 

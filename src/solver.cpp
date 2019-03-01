@@ -31,8 +31,8 @@ void Solver::solve() {
 	//_cand.print();
 	//_b.print();
 	do {
-		_b.print();
-		_cand.print();
+		//_b.print();
+		//_cand.print();
 		//std::cout<<"Performing STEP..."<<std::endl;
 		if (_findSingle()) { /*_b.print();*/ continue; }
 		if (_findHiddenSingleInRow()) { /*_b.print();*/ continue; }
@@ -52,7 +52,7 @@ void Solver::solve() {
 		std::cout<<"Done"<<std::endl;
 		break;
 	}
-	while (std::cin.ignore());
+	while (true/*std::cin.ignore()*/);
 	_b.print();
 	
 }
@@ -87,7 +87,7 @@ bool Solver::_findSingle() {
 	for (auto sq: squaresIterator::squares) {
 		if (_cand.getSize(sq) == 1) {
 			auto v = _cand.get(sq)[0];
-			std::cout<<"...Found single at "<< sq <<" value "<< v << std::endl;
+			_printInfo("single", std::vector<tSquares>(1, sq), std::vector<tValues>(1, v));
 			_setSquareValue(sq, v);
 			return true;
 		}
@@ -109,7 +109,7 @@ bool Solver::_findHiddenSingleIn(IT it, IT2 it2) {
 				}
 			}
 			if (count == 1) {
-				std::cout<<"...Found hidden single at "<< singleSq <<" value "<< v << std::endl;
+				_printInfo("hidden single", std::vector<tSquares>(1, singleSq), std::vector<tValues>(1, v));
 				_setSquareValue(singleSq, v);
 				return true;
 			}				
@@ -205,16 +205,7 @@ bool Solver::_findNakedIn(IT it, IT2 it2) {
 						}
 					}
 					if(candidatesChanged) {
-						std::cout<<"...FOUND naked group at ";
-						for (auto sq:sqList) {
-							std::cout<< sq <<", ";
-						}
-						std::cout<<std::endl;
-						std::cout<<"values ";
-						for (auto v: groupValues) {
-							std::cout<< v <<", ";
-						}
-						std::cout<<std::endl;
+						_printInfo("naked group", sqList, std::vector<tValues>(groupValues.begin(),groupValues.end()));
 						return true;
 					}
 				}
@@ -283,16 +274,7 @@ bool Solver::_findHiddenIn(IT it, IT2 it2) {
 					}
 				}
 				if (modified) {
-					std::cout<<"...FOUND hidden group at ";
-					for (auto sq: sqList) {
-						std::cout<< sq <<", ";
-					}
-					std::cout<<std::endl;
-					std::cout<<"values ";
-					for (auto v: valueList) {
-						std::cout<< v <<", ";
-					}
-					std::cout<<std::endl;
+					_printInfo("hidden group", sqList, valueList);
 					return true;
 				}
 				
@@ -340,12 +322,7 @@ bool Solver::_findPointingPairIn(IT it, IT2 it2) {
 					}
 				}
 				if (modified) {
-					std::cout<<"...FOUND pointing pair at ";
-					for (auto sq: squareList) {
-						std::cout<< sq <<", ";
-					}
-					std::cout<<std::endl;
-					std::cout<<"value: "<< v<<std::endl;
+					_printInfo("pointing pair", squareList, std::vector<tValues>(1, v));
 					return true;
 				}
 			}
@@ -385,12 +362,7 @@ bool Solver::_findBoxLineForRow() {
 					}
 				}
 				if (modified) {
-					std::cout<<"...FOUND box line reduction at ";
-					for (auto sq: squareList) {
-						std::cout<< sq <<", ";
-					}
-					std::cout<<std::endl;
-					std::cout<<"value: "<< v<<std::endl;
+					_printInfo("box line reduction", squareList, std::vector<tValues>(1, v));
 					return true;
 				}
 			}
@@ -420,16 +392,23 @@ bool Solver::_findBoxLineForFile() {
 					}
 				}
 				if (modified) {
-					std::cout<<"...FOUND box line reduction at ";
-					for (auto sq: squareList) {
-						std::cout<< sq <<", ";
-					}
-					std::cout<<std::endl;
-					std::cout<<"value: "<< v<<std::endl;
+					_printInfo("box line reduction", squareList, std::vector<tValues>(1, v));
 					return true;
 				}
 			}
 		}
 	}
 	return false;
+}
+
+void Solver::_printInfo(std::string type, std::vector<tSquares> sqList, std::vector<tValues> vList ) const {
+	std::cout<<"...FOUND "<<type<<" at ";
+	for (auto sq: sqList) {
+		std::cout<< sq <<", ";
+	}
+	std::cout<<"values: (";
+	for (auto v: vList) {
+		std::cout<< v <<", ";
+	}
+	std::cout<<")"<<std::endl;
 }

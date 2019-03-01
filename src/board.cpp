@@ -21,7 +21,27 @@
 #include "board.h"
 #include "iterators.h"
 
-Board::Board() { std::fill(_squares.begin(), _squares.end(), VALUE_NONE);}
+Board::Board() {_clear();}
+
+Board::Board(std::string input) {
+	_clear();
+	
+	// input validation
+	if (input.length() != 81) {return;}
+	for (auto s: input) {
+		std::vector<char> validInputChars = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+		if( std::find(validInputChars.begin(), validInputChars.end(), s) == validInputChars.end()) {return;}
+	}
+	
+	// fill the board
+	tSquares s = A1;
+	for (auto ch: input) {
+		if (ch != '0') {
+			setSquareValue(s, (tValues)(ch - '1'));
+		}
+		++s;
+	}
+}
 
 tValues Board::getSquareValue(const tSquares sn) const {
 	assert(sn >= startSquare && sn <= squareNumber);
@@ -108,4 +128,8 @@ bool Board::contains(const std::vector<tSquares>& in, const tValues v) const {
 	}
 	
 	return std::find(res.begin(), res.end(), v) != res.end();
+}
+
+void Board::_clear() {
+	std::fill(_squares.begin(), _squares.end(), VALUE_NONE);
 }

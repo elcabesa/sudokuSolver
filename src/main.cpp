@@ -26,7 +26,7 @@ void printStartInfo() {
 
 int main() {
 	printStartInfo();
-	
+/*	
 	Board b;
 	
 	b.setSquareValue(A1, VALUE_4);
@@ -55,7 +55,7 @@ int main() {
 	b.setSquareValue(I5, VALUE_3);
 	b.setSquareValue(I9, VALUE_6);
 	
-	
+*/	
 /*	b.setSquareValue(B1, VALUE_9);
 	b.setSquareValue(B3, VALUE_4);
 	b.setSquareValue(B4, VALUE_6);
@@ -126,7 +126,21 @@ int main() {
 	b.setSquareValue(I2, VALUE_3);
 	b.setSquareValue(I8, VALUE_7);*/
 		
-	/*b.setSquareValue(A2, VALUE_5);
+	
+	Board b(
+"058100040\
+300004800\
+100600000\
+704000300\
+000003270\
+060010498\
+070592080\
+800046100\
+000001000");
+	
+	/*Board b;
+	
+	b.setSquareValue(A2, VALUE_5);
 	b.setSquareValue(A3, VALUE_8);
 	b.setSquareValue(A4, VALUE_1);
 	b.setSquareValue(A8, VALUE_4);
@@ -163,7 +177,9 @@ int main() {
 	b.setSquareValue(H6, VALUE_6);
 	b.setSquareValue(H7, VALUE_1);
 	
-	b.setSquareValue(I6, VALUE_1);*/
+	b.setSquareValue(I6, VALUE_1);
+	
+	b.print();*/
 	Solver s(b);
 	s.solve();
 	
