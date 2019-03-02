@@ -28,8 +28,8 @@ class Board;
 
 class Solver {
 public:
-	Solver(Board& b);
-	void solve();
+	Solver(Board& b, bool verbose = true);
+	bool solve();
 private:
 	Board& _b;
 	Candidates _cand;
@@ -81,6 +81,8 @@ private:
 
 	bool _findBoxLineForRow();
 	bool _findBoxLineForFile();
+	
+	bool _verbose;
 	
 };
 
