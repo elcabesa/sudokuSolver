@@ -82,6 +82,9 @@ private:
 	bool _findBoxLineForRow();
 	bool _findBoxLineForFile();
 	
+	bool _findXWing1();
+	bool _findXWing2();
+	
 	bool _verbose;
 	
 };
