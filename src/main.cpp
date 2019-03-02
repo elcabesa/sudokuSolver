@@ -29,17 +29,31 @@ void printStartInfo() {
 
 int main(int argc, char* argv[]) {
 	printStartInfo();
+	
+	std::cout<<"------------------------------------------------------------------------------------------------------"<<std::endl;
 	if(argc == 1) {
 		std::ifstream myfile;
 		std::string s;
 		myfile.open("sudokus.txt");
+		unsigned int solved = 0;
+		unsigned int tested = 0;
 		while (myfile.good()) {
 			std::getline(myfile, s);
+			std::cout<<"testing: "<<s;
+			++tested;
 			Board b(s);
-			Solver s(b);
-			s.solve();
+			Solver s(b, false);
+			if (s.solve()) {
+				++solved;
+				std::cout<<" [SOLVED]"<<std::endl;
+			} else {
+				std::cout<<" [UNSOLVED]"<<std::endl;
+			}
 		}
 		myfile.close();
+		std::cout<<"------------------------------------------------------------------------------------------------------"<<std::endl;
+		std::cout<<"Solved "<<solved<<"/"<<tested<<std::endl;
+		
 	} else if (argc == 2) {
 		Board b(argv[1]);
 		Solver s(b);
