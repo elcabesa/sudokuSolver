@@ -17,6 +17,7 @@
 
 #include <bitset>
 #include <cassert>
+#include <list>
 #include <iostream>
 
 #include "board.h"
@@ -37,8 +38,6 @@ bool Solver::solve() {
 		std::cout<<"SOLVING"<<std::endl;
 	}
 	do {
-		//_b.print();
-		//_cand.print();
 		//std::cout<<"Performing STEP..."<<std::endl;
 		if (_findSingle()) { /*_b.print();*/ continue; }
 		if (_findHiddenSingleInRow()) { /*_b.print();*/ continue; }
@@ -54,6 +53,8 @@ bool Solver::solve() {
 		if (_findPointingPairInFile()) { /*_b.print();*/ continue; }
 		if (_findBoxLineForRow()) { /*_b.print();*/ continue; }
 		if (_findBoxLineForFile()) { /*_b.print();*/ continue; }
+		if (_findXWing1()) { /*_b.print();*/ continue; }
+		if (_findXWing2()) { /*_b.print();*/ continue; }
 		
 		if(_isSolved()) {
 			if (_verbose) {
@@ -446,4 +447,138 @@ void Solver::_printInfo(std::string type, std::vector<tSquares> sqList, std::vec
 
 bool Solver::_isSolved() {
 	return !_b.contains(std::vector<tSquares>(squaresIterator::squares.begin(), squaresIterator::squares.end()), VALUE_NONE);
+}
+
+bool Solver::_findXWing1() {
+	// for all the values
+	//std::cout<<"testing xwing"<<std::endl;
+	for(auto v: squaresIterator::value) {
+		//std::cout<<"value "<<v<<std::endl;
+		// find all the squares with v as candidate
+		std::vector<tSquares> tempList;
+		std::list<std::vector<tSquares>> list;
+		for (auto row: squaresIterator::row) {
+			//std::cout<<" testing row "<<row<<std::endl;
+			tempList.clear();
+			for (auto sq: squaresIterator::rows[row]) {
+				if (_cand.contains(sq, v)) {
+					tempList.push_back(sq);
+					//std::cout<<" found in square "<<sq<<std::endl;
+				}
+			}
+			if (tempList.size() == 2) {
+				//std::cout<<"found locked pair"<<std::endl;
+				list.push_back(tempList);
+			}
+		}
+		
+		/*std::cout<<"locked pairs list:"<<std::endl;
+		for (auto x: list) {
+			std::cout<<x[0]<<", "<<x[1]<<std::endl;
+		}*/
+		
+		// try to find an xwing in the list of locked pairs
+		for (auto x1: list) {
+			for (auto x2: list) {
+				if (
+					getRow(x2[0]) > getRow(x1[0])
+					&& getFile(x1[0]) == getFile(x2[0])
+					&& getFile(x1[1]) == getFile(x2[1])
+				) {
+					//std::cout<<"FOUND xwing at "<< x1[0]<<", "<<x1[1] <<"; "<< x2[0]<<", "<<x2[1]<<std::endl;
+					tFiles f1 = getFile(x1[0]); 
+					tFiles f2 = getFile(x1[1]); 
+					tRows  r1 = getRow(x1[0]); 
+					tRows  r2 = getRow(x2[0]); 
+					
+					bool modified = false;
+					// remove candidates from first file
+					for (auto sq: squaresIterator::files[f1]) {
+						if (getRow(sq) != r1 &&  getRow(sq) != r2) {
+							modified |= _cand.remove(sq, v);
+						}
+					}
+					// remove candidates from second file
+					for (auto sq: squaresIterator::files[f2]) {
+						if (getRow(sq) != r1 &&  getRow(sq) != r2) {
+							modified |= _cand.remove(sq, v);
+						}
+					}
+					std::vector<tSquares> squareList = {x1[0], x1[1], x2[0], x2[1]};
+					if (modified) {
+						_printInfo("xwing", squareList, std::vector<tValues>(1, v));
+						return true;
+					}	
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool Solver::_findXWing2() {
+	// for all the values
+	//std::cout<<"testing xwing"<<std::endl;
+	for(auto v: squaresIterator::value) {
+		//std::cout<<"value "<<v<<std::endl;
+		// find all the squares with v as candidate
+		std::vector<tSquares> tempList;
+		std::list<std::vector<tSquares>> list;
+		for (auto file: squaresIterator::file) {
+			//std::cout<<" testing file "<<row<<std::endl;
+			tempList.clear();
+			for (auto sq: squaresIterator::files[file]) {
+				if (_cand.contains(sq, v)) {
+					tempList.push_back(sq);
+					//std::cout<<" found in square "<<sq<<std::endl;
+				}
+			}
+			if (tempList.size() == 2) {
+				//std::cout<<"found locked pair"<<std::endl;
+				list.push_back(tempList);
+			}
+		}
+		
+		/*std::cout<<"locked pairs list:"<<std::endl;
+		for (auto x: list) {
+			std::cout<<x[0]<<", "<<x[1]<<std::endl;
+		}*/
+		
+		// try to find an xwing in the list of locked pairs
+		for (auto x1: list) {
+			for (auto x2: list) {
+				if (
+					getFile(x2[0]) > getFile(x1[0])
+					&& getRow(x1[0]) == getRow(x2[0])
+					&& getRow(x1[1]) == getRow(x2[1])
+				) {
+					//std::cout<<"FOUND xwing at "<< x1[0]<<", "<<x1[1] <<"; "<< x2[0]<<", "<<x2[1]<<std::endl;
+					tRows  r1 = getRow(x1[0]); 
+					tRows  r2 = getRow(x1[1]); 
+					tFiles f1 = getFile(x1[0]); 
+					tFiles f2 = getFile(x2[0]); 
+					
+					bool modified = false;
+					// remove candidates from first row
+					for (auto sq: squaresIterator::rows[r1]) {
+						if (getFile(sq) != f1 &&  getFile(sq) != f2) {
+							modified |= _cand.remove(sq, v);
+						}
+					}
+					// remove candidates from second row
+					for (auto sq: squaresIterator::rows[r2]) {
+						if (getFile(sq) != f1 &&  getFile(sq) != f2) {
+							modified |= _cand.remove(sq, v);
+						}
+					}
+					std::vector<tSquares> squareList = {x1[0], x1[1], x2[0], x2[1]};
+					if (modified) {
+						_printInfo("xwing", squareList, std::vector<tValues>(1, v));
+						return true;
+					}	
+				}
+			}
+		}
+	}
+	return false;
 }
