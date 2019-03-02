@@ -35,6 +35,7 @@ private:
 	Candidates _cand;
 	
 	void _printInfo(std::string type, std::vector<tSquares> sqList, std::vector<tValues> vList ) const;
+	bool _isSolved();
 	
 	bool _findSingle();
 	

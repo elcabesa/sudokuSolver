@@ -29,7 +29,10 @@ Solver::Solver(Board& b): _b(b), _cand(b){}
 void Solver::solve() {
 	_cand.fillCandidates();
 	//_cand.print();
-	//_b.print();
+	std::cout<<"INITIAL BOARD"<<std::endl;
+	_b.print();
+	std::cout<<"---------------------------------------------"<<std::endl;
+	std::cout<<"SOLVING"<<std::endl;
 	do {
 		//_b.print();
 		//_cand.print();
@@ -49,10 +52,17 @@ void Solver::solve() {
 		if (_findBoxLineForRow()) { /*_b.print();*/ continue; }
 		if (_findBoxLineForFile()) { /*_b.print();*/ continue; }
 		
-		std::cout<<"Done"<<std::endl;
+		if(_isSolved()) {
+			std::cout<<"SOLVED"<<std::endl;
+			std::cout<<"---------------------------------------------"<<std::endl;
+			
+		} else {
+			std::cout<<"UNSOLVED"<<std::endl;
+			std::cout<<"---------------------------------------------"<<std::endl;
+		}
 		break;
 	}
-	while (true/*std::cin.ignore()*/);
+	while (true);
 	_b.print();
 	
 }
@@ -411,4 +421,8 @@ void Solver::_printInfo(std::string type, std::vector<tSquares> sqList, std::vec
 		std::cout<< v <<", ";
 	}
 	std::cout<<")"<<std::endl;
+}
+
+bool Solver::_isSolved() {
+	return !_b.contains(std::vector<tSquares>(squaresIterator::squares.begin(), squaresIterator::squares.end()), VALUE_NONE);
 }
