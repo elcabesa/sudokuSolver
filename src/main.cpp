@@ -21,7 +21,7 @@
 #include "solver.h"
 
 void printStartInfo() {
-	std::cout<<"SudokuSolver by Marco Belli"<<std::endl;
+	std::cout<<"SudokuSolver V1.0.0 by Marco Belli"<<std::endl;
 }
 
 int main(int argc, char* argv[]) {
