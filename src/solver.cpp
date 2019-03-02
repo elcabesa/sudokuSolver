@@ -24,15 +24,18 @@
 #include "iterators.h"
 #include "solver.h"
 
-Solver::Solver(Board& b): _b(b), _cand(b){}
+Solver::Solver(Board& b, bool verbose): _b(b), _cand(b), _verbose(verbose){}
 
-void Solver::solve() {
+bool Solver::solve() {
+	bool solved = false;
 	_cand.fillCandidates();
 	//_cand.print();
-	std::cout<<"INITIAL BOARD"<<std::endl;
-	_b.print();
-	std::cout<<"---------------------------------------------"<<std::endl;
-	std::cout<<"SOLVING"<<std::endl;
+	if (_verbose) {
+		std::cout<<"INITIAL BOARD"<<std::endl;
+		_b.print();
+		std::cout<<"---------------------------------------------"<<std::endl;
+		std::cout<<"SOLVING"<<std::endl;
+	}
 	do {
 		//_b.print();
 		//_cand.print();
@@ -53,17 +56,27 @@ void Solver::solve() {
 		if (_findBoxLineForFile()) { /*_b.print();*/ continue; }
 		
 		if(_isSolved()) {
-			std::cout<<"SOLVED"<<std::endl;
-			std::cout<<"---------------------------------------------"<<std::endl;
+			if (_verbose) {
+				std::cout<<"SOLVED"<<std::endl;
+				std::cout<<"---------------------------------------------"<<std::endl;
+			}
+			solved = true;
 			
 		} else {
-			std::cout<<"UNSOLVED"<<std::endl;
-			std::cout<<"---------------------------------------------"<<std::endl;
+			if (_verbose) {
+				std::cout<<"UNSOLVED"<<std::endl;
+				std::cout<<"---------------------------------------------"<<std::endl;
+			}
+			solved = false;
 		}
 		break;
 	}
 	while (true);
-	_b.print();
+	if (_verbose) {
+		std::cout<<"FINAL BOARD"<<std::endl;
+		_b.print();
+	}
+	return solved;
 	
 }
 
@@ -412,15 +425,23 @@ bool Solver::_findBoxLineForFile() {
 }
 
 void Solver::_printInfo(std::string type, std::vector<tSquares> sqList, std::vector<tValues> vList ) const {
-	std::cout<<"...FOUND "<<type<<" at ";
-	for (auto sq: sqList) {
-		std::cout<< sq <<", ";
+	if (_verbose) {
+		std::cout<<"...FOUND "<<type<<" at ";
+		for (auto & sq: sqList) {
+			std::cout<< sq;
+			if (&sq != &sqList.back()) {
+				std::cout<<", ";
+			}
+		}
+		std::cout<<" values: (";
+		for (auto& v: vList) {
+			std::cout<< v;
+			if (&v != &vList.back()) {
+				std::cout<<", ";
+			}
+		}
+		std::cout<<")"<<std::endl;
 	}
-	std::cout<<"values: (";
-	for (auto v: vList) {
-		std::cout<< v <<", ";
-	}
-	std::cout<<")"<<std::endl;
 }
 
 bool Solver::_isSolved() {
