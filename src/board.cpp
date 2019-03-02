@@ -107,16 +107,14 @@ bool Board::_checkForDuplicate( std::vector<tSquares> in) const
 	}
 }
 
-void Board::print() const {
-	std::cerr<<"BOARD"<<std::endl;
-	
+void Board::print() const {	
 	for (auto r: squaresIterator::row) {
 		for (auto f: squaresIterator::file) {
 			auto v = getSquareValue(r, f);
-			if (v == VALUE_NONE) { std::cerr<<"x"; }
-			else { std::cerr << v; }
+			if (v == VALUE_NONE) { std::cout<<"x"; }
+			else { std::cout << v; }
 		}
-		std::cerr<<std::endl;
+		std::cout<<std::endl;
 	}
 }
 

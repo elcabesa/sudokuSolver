@@ -63,6 +63,7 @@ void Solver::solve() {
 		break;
 	}
 	while (true);
+	std::cout<<"FINAL BOARD"<<std::endl;
 	_b.print();
 	
 }
@@ -413,12 +414,18 @@ bool Solver::_findBoxLineForFile() {
 
 void Solver::_printInfo(std::string type, std::vector<tSquares> sqList, std::vector<tValues> vList ) const {
 	std::cout<<"...FOUND "<<type<<" at ";
-	for (auto sq: sqList) {
-		std::cout<< sq <<", ";
+	for (auto & sq: sqList) {
+		std::cout<< sq;
+		if (&sq != &sqList.back()) {
+			std::cout<<", ";
+		}
 	}
-	std::cout<<"values: (";
-	for (auto v: vList) {
-		std::cout<< v <<", ";
+	std::cout<<" values: (";
+	for (auto& v: vList) {
+		std::cout<< v;
+		if (&v != &vList.back()) {
+			std::cout<<", ";
+		}
 	}
 	std::cout<<")"<<std::endl;
 }
