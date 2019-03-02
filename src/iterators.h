@@ -15,36 +15,30 @@
     along with SudokuSolver.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef _BOARD_H
-#define _BOARD_H
+#ifndef _ITERATORS_H
+#define _ITERATORS_H
 
-#include <algorithm>
 #include <array>
-#include <string>
 #include <vector>
 
 #include "tSquares.h"
 #include "value.h"
 
-class Board {
+class squaresIterator {
 public:
-	explicit Board();
-	explicit Board(std::string input);
-	tValues getSquareValue(const tSquares sn) const;
-	void setSquareValue(const tSquares sn, const tValues v);
-	tValues getSquareValue(const tRows r, const tFiles f) const;
-	void setSquareValue(const tRows r, const tFiles f, const tValues v);
+	static const std::array<tRows, rowNumber> row;
+	static const std::array<tFiles, fileNumber> file;
+	static const std::array<tBoxes, boxNumber> box;
+	static const std::array<tValues, 9> value;
+	static const std::array<tSquares, 81> squares;
 	
-	bool checkBoard() const;
+	static const std::array<std::vector<tSquares>, rowNumber> rows;
+	static const std::array<std::vector<tSquares>, fileNumber> files;
+	static const std::array<std::vector<tSquares>, boxNumber> boxes;
 	
-	bool contains(const std::vector<tSquares>& in, const tValues v) const;
-	void print() const;
-private:
-	std::array<tValues, squareNumber> _squares;
-	static bool _areEqualValues(const tValues i, const tValues j);
-	bool _checkForDuplicate( std::vector<tSquares> in) const;
-	void _clear();
-	
+	static bool isInRow(const tRows r, const tSquares s);
+	static bool isInFile(const tFiles f, const tSquares s);
+	static bool isInBox(const tBoxes b, const tSquares s);
 };
 
 #endif

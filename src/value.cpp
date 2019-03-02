@@ -14,24 +14,12 @@
     You should have received a copy of the GNU General Public License
     along with SudokuSolver.  If not, see <http://www.gnu.org/licenses/>
 */
-#include <iostream>
 
-#include "board.h"
-#include "candidates.h"
-#include "solver.h"
+#include <ostream>
 
-void printStartInfo() {
-	std::cout<<"SudokuSolver V1.0.0 by Marco Belli"<<std::endl;
-}
+#include "value.h"
 
-int main(int argc, char* argv[]) {
-	printStartInfo();
-	
-	if(argc == 2) {
-		Board b(argv[1]);
-		Solver s(b);
-		s.solve();
-		return 0;
-	}
-	return -1;
+std::ostream& operator <<(std::ostream& stream, const tValues& v) {
+	stream << (1 + v) ;
+	return stream;
 }

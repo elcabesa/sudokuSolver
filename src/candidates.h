@@ -14,24 +14,34 @@
     You should have received a copy of the GNU General Public License
     along with SudokuSolver.  If not, see <http://www.gnu.org/licenses/>
 */
-#include <iostream>
 
-#include "board.h"
-#include "candidates.h"
-#include "solver.h"
+#ifndef _CANDIDATES_H
+#define _CANDIDATES_H
 
-void printStartInfo() {
-	std::cout<<"SudokuSolver V1.0.0 by Marco Belli"<<std::endl;
-}
 
-int main(int argc, char* argv[]) {
-	printStartInfo();
-	
-	if(argc == 2) {
-		Board b(argv[1]);
-		Solver s(b);
-		s.solve();
-		return 0;
-	}
-	return -1;
-}
+#include <array>
+#include <vector>
+
+#include "tSquares.h"
+#include "value.h"
+
+class Board;
+
+class Candidates {
+public:
+	Candidates(const Board& b);
+	void clear();
+	void add(const tSquares sq, tValues v);
+	bool remove(const tSquares sq, tValues v);
+	const std::vector<tValues>& get(const tSquares sq) const;
+	size_t getSize(const tSquares sq) const;
+	void fillCandidates();
+	void print() const;
+	void print(const tSquares sq) const;
+	bool contains(const tSquares sq, tValues v) const;
+private:
+	const Board& _b;
+	std::array<std::vector<tValues>, squareNumber> _squares;
+};
+
+#endif
