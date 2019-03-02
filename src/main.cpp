@@ -14,7 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with SudokuSolver.  If not, see <http://www.gnu.org/licenses/>
 */
+
+#include <fstream>
 #include <iostream>
+#include <string>
 
 #include "board.h"
 #include "candidates.h"
@@ -26,8 +29,18 @@ void printStartInfo() {
 
 int main(int argc, char* argv[]) {
 	printStartInfo();
-	
-	if(argc == 2) {
+	if(argc == 1) {
+		std::ifstream myfile;
+		std::string s;
+		myfile.open("sudokus.txt");
+		while (myfile.good()) {
+			std::getline(myfile, s);
+			Board b(s);
+			Solver s(b);
+			s.solve();
+		}
+		myfile.close();
+	} else if (argc == 2) {
 		Board b(argv[1]);
 		Solver s(b);
 		s.solve();
