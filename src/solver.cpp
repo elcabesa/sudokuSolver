@@ -15,6 +15,7 @@
     along with SudokuSolver.  If not, see <http://www.gnu.org/licenses/>
 */
 
+#include <algorithm>
 #include <bitset>
 #include <cassert>
 #include <list>
@@ -55,6 +56,7 @@ bool Solver::solve() {
 		if (_findBoxLineForFile()) { /*_b.print();*/ continue; }
 		if (_findXWing1()) { /*_b.print();*/ continue; }
 		if (_findXWing2()) { /*_b.print();*/ continue; }
+		if (_findYWing()) { /*_b.print();*/ continue; }
 		
 		if(_isSolved()) {
 			if (_verbose) {
@@ -576,6 +578,95 @@ bool Solver::_findXWing2() {
 						_printInfo("xwing", squareList, std::vector<tValues>(1, v));
 						return true;
 					}	
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool Solver::_findYWing() {
+	/*std::cout<<"testing ywing"<<std::endl;*/
+	std::vector<tSquares> sqList;
+	for( auto sq: squaresIterator::squares)
+	{
+		if (_cand.getSize(sq) == 2) {
+			sqList.push_back(sq);
+		}
+	}
+	/*std::cout<<"list of candidate squares: ";
+	for (auto sq: sqList) {
+		std::cout<<sq<<",";
+	}
+	std::cout<<std::endl;*/
+	
+	// search for y-wing in candidates
+	for (auto sq1: sqList) {
+		auto AB = _cand.get(sq1);
+		for (auto sq2: sqList) {
+			auto BC = _cand.get(sq2);
+			for (auto sq3: sqList) {
+				// todo questo if alla fine controlla che esista una sfera di influenza non vuota..... posso provare ad approfondire il concetto 
+				if (
+					(areOnTheSameFile({sq1,sq2}) != FILE_NONE || areOnTheSameRow({sq1,sq2}) != ROW_NONE || areOnTheSameBox({sq1,sq2}) != BOX_NONE)
+				    && (areOnTheSameFile({sq1,sq3}) != FILE_NONE || areOnTheSameRow({sq1,sq3}) != ROW_NONE || areOnTheSameBox({sq1,sq3}) != BOX_NONE)
+				){
+					auto AC = _cand.get(sq3);
+					if( 
+						   std::find(BC.begin(), BC.end(), AB[0]) != BC.end()
+						&& std::find(AC.begin(), AC.end(), AB[1]) != AC.end()
+					) {
+						// check if the last value is C in BC and AC
+						// find C
+						tValues C =VALUE_NONE;
+						for (auto val: BC) {
+							if( std::find(AB.begin(), AB.end(), val) == AB.end()) {
+								C = val;
+							}
+						}
+						if ( C != VALUE_NONE && std::find(AC.begin(), AC.end(), C) != AC.end()) {
+							
+							/*std::cout<<" found probable ywing at "<<sq1<<", "<<sq2<<", "<<sq3<<std::endl;*/
+							
+							// todo calcolare sfera di influenza di una casa.... e fare intersezione fra sq2 e sq3 per trovare le case in cui rimuovere i C dai candidati :)
+							//calc sq2 influence area.						
+							std::set<tSquares> set1;
+							for (auto sq: squaresIterator::files[getFile(sq2)]) {set1.insert(sq);}
+							for (auto sq: squaresIterator::rows[getRow(sq2)]) {set1.insert(sq);}
+							for (auto sq: squaresIterator::boxes[getBox(sq2)]) {set1.insert(sq);}
+							//calc sq3 influence area.						
+							std::set<tSquares> set2;
+							for (auto sq: squaresIterator::files[getFile(sq3)]) {set2.insert(sq);}
+							for (auto sq: squaresIterator::rows[getRow(sq3)]) {set2.insert(sq);}
+							for (auto sq: squaresIterator::boxes[getBox(sq3)]) {set2.insert(sq);}
+							
+							std::vector<tSquares> res;
+							// calc intersection
+							for (auto sq: set1) {
+								if (std::find(set2.begin(), set2.end(), sq) != set2.end()) {
+									res.push_back(sq);
+								}
+							}
+							/*std::cout<<"intersection squares ";
+							for (auto sq: res) {
+								std::cout<<sq<<",";
+							}
+							std::cout<<std::endl;*/
+							
+							bool modified = false;
+							for (auto sq: res) { 
+								if (sq != sq1 && sq != sq2 && sq != sq3) {
+									auto x =  _cand.remove(sq, C);
+									modified |= x;
+									/*if(x)std::cout<<"removed "<<C<<" from "<<sq<<std::endl;*/
+								}
+							}
+							if (modified) {
+								_printInfo("yWing", {sq1, sq2, sq3}, std::vector<tValues>(1, C));
+								return true;
+							}
+						}
+					}
 				}
 			}
 		}

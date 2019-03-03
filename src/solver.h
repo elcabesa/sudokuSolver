@@ -85,6 +85,8 @@ private:
 	bool _findXWing1();
 	bool _findXWing2();
 	
+	bool _findYWing();
+	
 	bool _verbose;
 	
 };
