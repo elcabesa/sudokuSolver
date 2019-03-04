@@ -42,8 +42,8 @@ int main(int argc, char* argv[]) {
 			std::cout<<"testing: "<<s;
 			++tested;
 			Board b(s);
-			Solver s(b, false);
-			if (s.solve()) {
+			Solver slv(b, false);
+			if (slv.solve()) {
 				++solved;
 				std::cout<<" [SOLVED]"<<std::endl;
 			} else {
