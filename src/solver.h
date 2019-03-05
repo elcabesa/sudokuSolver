@@ -63,8 +63,10 @@ private:
 	bool _containSolvedCell(std::vector<tSquares> vec) const;
 	
 	std::set<tValues> _createUnionOfValuesFromCell(std::vector<tSquares> sqList) const;
+	std::set<tValues> _getComplementaryList(std::vector<tValues> vList) const;
+	std::vector<tSquares> _getComplementaryList(std::vector<tSquares> sqList, std::vector<tSquares> refList) const;
 	
-	bool _removeCandidatesFromCell(const tSquares sq, std::set<tValues> groupValues);
+	bool _removeCandidatesFromCells(const std::vector<tSquares> sqList, std::set<tValues> groupValues);
 	
 	template <class IT, class IT2>
 	bool _findHiddenIn(IT it, IT2 it2);
@@ -88,6 +90,11 @@ private:
 	bool _findYWing();
 	
 	bool _verbose;
+	
+	template <class IT>
+	bool _RemoveCandidateFrom(IT sqList, tValues v);
+	
+	
 	
 };
 

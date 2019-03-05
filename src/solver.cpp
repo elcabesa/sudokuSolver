@@ -105,7 +105,6 @@ void Solver::_setSquareValue(const tSquares sq, const tValues v) {
 	for (auto s: squaresIterator::boxes[getBox(sq)]) {
 		_cand.remove(s, v);
 	}
-	
 }
 
 bool Solver::_findSingle() {
@@ -193,10 +192,10 @@ std::set<tValues> Solver::_createUnionOfValuesFromCell(std::vector<tSquares> sqL
 	return groupValues;
 }
 
-bool Solver::_removeCandidatesFromCell(const tSquares sq, std::set<tValues> groupValues) {
+bool Solver::_removeCandidatesFromCells(const std::vector<tSquares> sqList, std::set<tValues> groupValues) {
 	bool candidatesChanged = false;
 	for (auto v: groupValues) {
-		candidatesChanged |= _cand.remove(sq, v);
+		candidatesChanged |= _RemoveCandidateFrom(sqList, v);
 	}
 	return candidatesChanged;
 }
@@ -222,15 +221,8 @@ bool Solver::_findNakedIn(IT it, IT2 it2) {
 				if (sqList.size() == groupValues.size()) {
 					// found a nake group. let's try so simplify
 					
-					bool candidatesChanged = false;
-					
 					// for all the squares outside sqList
-					for ( const auto sq: it2[b]) {
-						if (std::find(sqList.begin(), sqList.end(), sq) == sqList.end()) {
-							candidatesChanged |= _removeCandidatesFromCell(sq, groupValues);
-						}
-					}
-					if(candidatesChanged) {
+					if (_removeCandidatesFromCells(_getComplementaryList(sqList, it2[b]), groupValues)) {
 						_printInfo("naked group", sqList, std::vector<tValues>(groupValues.begin(),groupValues.end()));
 						return true;
 					}
@@ -290,20 +282,11 @@ bool Solver::_findHiddenIn(IT it, IT2 it2) {
 				
 			if (sqList.size() == valueList.size() && sqList.size() != 0 && foundValues.size() == valueList.size()) {
 				// found a hidden group. let's try so simplify
-				bool modified = false;
-				for (auto sq: sqList) {
-					for(auto v: squaresIterator::value) {
-						if (std::find(valueList.begin(), valueList.end(), v) == valueList.end()) {
-							// todo manage cand remo
-							modified |= _cand.remove(sq, v);
-						}
-					}
-				}
-				if (modified) {
+				// remove values from complementary value list
+				if (_removeCandidatesFromCells(sqList, _getComplementaryList(valueList))) {
 					_printInfo("hidden group", sqList, valueList);
 					return true;
 				}
-				
 			}
 		}
 	}
@@ -340,17 +323,12 @@ bool Solver::_findPointingPairIn(IT it, IT2 it2) {
 			}
 			
 			if (auto b = areOnTheSameBox(squareList); b != BOX_NONE ) {
-				bool modified = false;
 				// you can remove the value from all other squares in the box
-				for (auto sq: squaresIterator::boxes[b]) { 
-					if (std::find(squareList.begin(), squareList.end(), sq) == squareList.end()) {
-						modified |= _cand.remove(sq, v);
-					}
-				}
-				if (modified) {
+				if (_RemoveCandidateFrom(_getComplementaryList(squareList, squaresIterator::boxes[b]), v)) {
 					_printInfo("pointing pair", squareList, std::vector<tValues>(1, v));
 					return true;
 				}
+
 			}
 		}
 	}
@@ -380,14 +358,8 @@ bool Solver::_findBoxLineForRow() {
 			}
 			
 			if (auto b = areOnTheSameRow(squareList); b != ROW_NONE ) {
-				bool modified = false;
-				// you can remove the value from all other squares in the box
-				for (auto sq: squaresIterator::rows[b]) { 
-					if (std::find(squareList.begin(), squareList.end(), sq) == squareList.end()) {
-						modified |= _cand.remove(sq, v);
-					}
-				}
-				if (modified) {
+				// you can remove the value from all other squares in the row
+				if (_RemoveCandidateFrom(_getComplementaryList(squareList, squaresIterator::rows[b]), v)) {
 					_printInfo("box line reduction", squareList, std::vector<tValues>(1, v));
 					return true;
 				}
@@ -410,14 +382,8 @@ bool Solver::_findBoxLineForFile() {
 			}
 			
 			if (auto b = areOnTheSameFile(squareList); b != FILE_NONE ) {
-				bool modified = false;
-				// you can remove the value from all other squares in the box
-				for (auto sq: squaresIterator::files[b]) { 
-					if (std::find(squareList.begin(), squareList.end(), sq) == squareList.end()) {
-						modified |= _cand.remove(sq, v);
-					}
-				}
-				if (modified) {
+				// you can remove the value from all other squares in the file
+				if (_RemoveCandidateFrom(_getComplementaryList(squareList, squaresIterator::files[b]), v)) {
 					_printInfo("box line reduction", squareList, std::vector<tValues>(1, v));
 					return true;
 				}
@@ -493,22 +459,21 @@ bool Solver::_findXWing1() {
 					tRows  r1 = getRow(x1[0]); 
 					tRows  r2 = getRow(x2[0]); 
 					
-					bool modified = false;
-					// remove candidates from first file
+					std::vector<tSquares> sqList;
+					// create list of squares on which remove V as candidate
 					for (auto sq: squaresIterator::files[f1]) {
 						if (getRow(sq) != r1 &&  getRow(sq) != r2) {
-							modified |= _cand.remove(sq, v);
+							sqList.push_back(sq);
 						}
 					}
-					// remove candidates from second file
 					for (auto sq: squaresIterator::files[f2]) {
 						if (getRow(sq) != r1 &&  getRow(sq) != r2) {
-							modified |= _cand.remove(sq, v);
+							sqList.push_back(sq);
 						}
 					}
-					std::vector<tSquares> squareList = {x1[0], x1[1], x2[0], x2[1]};
-					if (modified) {
-						_printInfo("xwing", squareList, std::vector<tValues>(1, v));
+					
+					if (_RemoveCandidateFrom(sqList, v)) {
+						_printInfo("xwing", {x1[0], x1[1], x2[0], x2[1]}, std::vector<tValues>(1, v));
 						return true;
 					}	
 				}
@@ -560,22 +525,21 @@ bool Solver::_findXWing2() {
 					tFiles f1 = getFile(x1[0]); 
 					tFiles f2 = getFile(x2[0]); 
 					
-					bool modified = false;
-					// remove candidates from first row
+					std::vector<tSquares> sqList;
+					// create list of squares on which remove V as candidate
 					for (auto sq: squaresIterator::rows[r1]) {
 						if (getFile(sq) != f1 &&  getFile(sq) != f2) {
-							modified |= _cand.remove(sq, v);
+							sqList.push_back(sq);
 						}
 					}
-					// remove candidates from second row
 					for (auto sq: squaresIterator::rows[r2]) {
 						if (getFile(sq) != f1 &&  getFile(sq) != f2) {
-							modified |= _cand.remove(sq, v);
+							sqList.push_back(sq);
 						}
 					}
-					std::vector<tSquares> squareList = {x1[0], x1[1], x2[0], x2[1]};
-					if (modified) {
-						_printInfo("xwing", squareList, std::vector<tValues>(1, v));
+					
+					if (_RemoveCandidateFrom(sqList, v)) {
+						_printInfo("xwing", {x1[0], x1[1], x2[0], x2[1]}, std::vector<tValues>(1, v));
 						return true;
 					}	
 				}
@@ -652,16 +616,7 @@ bool Solver::_findYWing() {
 								std::cout<<sq<<",";
 							}
 							std::cout<<std::endl;*/
-							
-							bool modified = false;
-							for (auto sq: res) { 
-								if (sq != sq1 && sq != sq2 && sq != sq3) {
-									auto x =  _cand.remove(sq, C);
-									modified |= x;
-									/*if(x)std::cout<<"removed "<<C<<" from "<<sq<<std::endl;*/
-								}
-							}
-							if (modified) {
+							if (_RemoveCandidateFrom(_getComplementaryList({sq1, sq2, sq3}, res), C)) {
 								_printInfo("yWing", {sq1, sq2, sq3}, std::vector<tValues>(1, C));
 								return true;
 							}
@@ -672,4 +627,35 @@ bool Solver::_findYWing() {
 		}
 	}
 	return false;
+}
+
+template <class IT>
+bool Solver::_RemoveCandidateFrom(IT sqList, tValues v) {
+	bool modified = false;
+	for (auto sq: sqList) { 
+		auto x =  _cand.remove(sq, v);
+		modified |= x;
+		/*if(x)std::cout<<"removed "<<C<<" from "<<sq<<std::endl;*/
+	}
+	return modified;
+}
+
+std::set<tValues> Solver::_getComplementaryList(std::vector<tValues> vList) const {
+	std::set<tValues> complementaryValueList;
+	for(auto v: squaresIterator::value) {
+		if (std::find(vList.begin(), vList.end(), v) == vList.end()) {
+			complementaryValueList.insert(v);
+		}
+	}
+	return complementaryValueList;
+}
+
+std::vector<tSquares> Solver::_getComplementaryList(std::vector<tSquares> sqList, std::vector<tSquares> refList) const {
+	std::vector<tSquares> complSquares;
+	for (auto sq: refList) { 
+		if (std::find(sqList.begin(), sqList.end(), sq) == sqList.end()) {
+			complSquares.push_back(sq);
+		}
+	}
+	return complSquares;
 }
