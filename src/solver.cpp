@@ -26,7 +26,25 @@
 #include "iterators.h"
 #include "solver.h"
 
-Solver::Solver(Board& b, bool verbose): _b(b), _cand(b), _verbose(verbose){}
+Solver::Solver(Board& b, bool verbose): _verbose(verbose), _b(b), _cand(b){
+	_methods.push_back(_findSingle);
+	_methods.push_back(_findHiddenSingleInRow);
+	_methods.push_back(_findHiddenSingleInFile);
+	_methods.push_back(_findHiddenSingleInBox);
+	_methods.push_back(_findNakedInRow);
+	_methods.push_back(_findNakedInFile);
+	_methods.push_back(_findNakedInBox);
+	_methods.push_back(_findHiddenInRow);
+	_methods.push_back(_findHiddenInFile);
+	_methods.push_back(_findHiddenInBox);
+	_methods.push_back(_findPointingPairInRow);
+	_methods.push_back(_findPointingPairInFile);
+	_methods.push_back(_findBoxLineForRow);
+	_methods.push_back(_findBoxLineForFile);
+	_methods.push_back(_findXWing1);
+	_methods.push_back(_findXWing2);
+	_methods.push_back(_findYWing);
+}
 
 bool Solver::solve() {
 	bool solved = false;
@@ -38,43 +56,35 @@ bool Solver::solve() {
 		std::cout<<"---------------------------------------------"<<std::endl;
 		std::cout<<"SOLVING"<<std::endl;
 	}
+	bool stepPerformed = false;
 	do {
 		//std::cout<<"Performing STEP..."<<std::endl;
-		if (_findSingle()) { /*_b.print();*/ continue; }
-		if (_findHiddenSingleInRow()) { /*_b.print();*/ continue; }
-		if (_findHiddenSingleInFile()) { /*_b.print();*/ continue; }
-		if (_findHiddenSingleInBox()) { /*_b.print();*/ continue; }
-		if (_findNakedInRow()) { /*_b.print();*/ continue; }
-		if (_findNakedInFile()) { /*_b.print();*/ continue; }
-		if (_findNakedInBox()) { /*_b.print();*/ continue; }
-		if (_findHiddenInRow()) { /*_b.print();*/ continue; }
-		if (_findHiddenInFile()) { /*_b.print();*/ continue; }
-		if (_findHiddenInBox()) { /*_b.print();*/ continue; }
-		if (_findPointingPairInRow()) { /*_b.print();*/ continue; }
-		if (_findPointingPairInFile()) { /*_b.print();*/ continue; }
-		if (_findBoxLineForRow()) { /*_b.print();*/ continue; }
-		if (_findBoxLineForFile()) { /*_b.print();*/ continue; }
-		if (_findXWing1()) { /*_b.print();*/ continue; }
-		if (_findXWing2()) { /*_b.print();*/ continue; }
-		if (_findYWing()) { /*_b.print();*/ continue; }
-		
-		if(_isSolved()) {
-			if (_verbose) {
-				std::cout<<"SOLVED"<<std::endl;
-				std::cout<<"---------------------------------------------"<<std::endl;
+		stepPerformed = false;
+		for (auto m: _methods) {
+			stepPerformed = (this->*m)();
+			if (stepPerformed) {
+				break;
 			}
-			solved = true;
-			
-		} else {
-			if (_verbose) {
-				std::cout<<"UNSOLVED"<<std::endl;
-				std::cout<<"---------------------------------------------"<<std::endl;
-			}
-			solved = false;
 		}
-		break;
 	}
-	while (true);
+	while (stepPerformed);
+	
+	if(_isSolved()) {
+		if (_verbose) {
+			std::cout<<"SOLVED"<<std::endl;
+			std::cout<<"---------------------------------------------"<<std::endl;
+		}
+		solved = true;
+		
+	} else {
+		if (_verbose) {
+			std::cout<<"UNSOLVED"<<std::endl;
+			std::cout<<"---------------------------------------------"<<std::endl;
+		}
+		solved = false;
+	}
+
+	
 	if (_verbose) {
 		std::cout<<"FINAL BOARD"<<std::endl;
 		_b.print();

@@ -31,43 +31,40 @@ public:
 	Solver(Board& b, bool verbose = true);
 	bool solve();
 private:
+	std::vector<bool(Solver::*)()> _methods;
+	bool _verbose;
 	Board& _b;
 	Candidates _cand;
 	
+	void _setSquareValue(const tSquares t, const tValues v);
 	void _printInfo(std::string type, std::vector<tSquares> sqList, std::vector<tValues> vList ) const;
 	bool _isSolved();
-	
-	bool _findSingle();
-	
-	bool _findHiddenSingleInRow();
-	bool _findHiddenSingleInFile();
-	bool _findHiddenSingleInBox();
-	
-	template <class IT, class IT2>
-	bool _findHiddenSingleIn(IT it, IT2 it2);
-	
-	
-	template <class IT, class IT2>
-	bool _findNakedIn(IT it, IT2 it2);
-	
-	bool _findNakedInRow();
-	bool _findNakedInFile();
-	bool _findNakedInBox();
-	
-	
-	void _setSquareValue(const tSquares t, const tValues v);
-	
 	template <class type>
 	std::vector<type> _getListFromBitset(const unsigned int n, std::vector<type> vec) const;
-	
 	bool _containSolvedCell(std::vector<tSquares> vec) const;
-	
 	std::set<tValues> _createUnionOfValuesFromCell(std::vector<tSquares> sqList) const;
 	std::set<tValues> _getComplementaryList(std::vector<tValues> vList) const;
 	std::vector<tSquares> _getComplementaryList(std::vector<tSquares> sqList, std::vector<tSquares> refList) const;
-	
 	bool _removeCandidatesFromCells(const std::vector<tSquares> sqList, std::set<tValues> groupValues);
-	
+	template <class IT>
+	bool _RemoveCandidateFrom(IT sqList, tValues v);
+
+
+	bool _findSingle();
+
+	bool _findHiddenSingleInRow();
+	bool _findHiddenSingleInFile();
+	bool _findHiddenSingleInBox();
+	template <class IT, class IT2>
+	bool _findHiddenSingleIn(IT it, IT2 it2);
+
+	template <class IT, class IT2>
+	bool _findNakedIn(IT it, IT2 it2);
+
+	bool _findNakedInRow();
+	bool _findNakedInFile();
+	bool _findNakedInBox();
+
 	template <class IT, class IT2>
 	bool _findHiddenIn(IT it, IT2 it2);
 	
@@ -77,7 +74,6 @@ private:
 	
 	template <class IT, class IT2>
 	bool _findPointingPairIn(IT it, IT2 it2);
-	
 	bool _findPointingPairInRow();
 	bool _findPointingPairInFile();
 
@@ -88,14 +84,6 @@ private:
 	bool _findXWing2();
 	
 	bool _findYWing();
-	
-	bool _verbose;
-	
-	template <class IT>
-	bool _RemoveCandidateFrom(IT sqList, tValues v);
-	
-	
-	
 };
 
 #endif
