@@ -21,7 +21,7 @@
 #include <set>
 #include <string>
 
-#include "Candidates.h"
+#include "candidates.h"
 #include "value.h"
 
 class Board;
