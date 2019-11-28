@@ -26,74 +26,53 @@
 #include "iterators.h"
 #include "solver.h"
 
-Solver::Solver(Board& b, bool verbose): _verbose(verbose), _b(b), _cand(b){
-	_methods.push_back(_findSingle);
-	_methods.push_back(_findHiddenSingleInRow);
-	_methods.push_back(_findHiddenSingleInFile);
-	_methods.push_back(_findHiddenSingleInBox);
-	_methods.push_back(_findNakedInRow);
-	_methods.push_back(_findNakedInFile);
-	_methods.push_back(_findNakedInBox);
-	_methods.push_back(_findHiddenInRow);
-	_methods.push_back(_findHiddenInFile);
-	_methods.push_back(_findHiddenInBox);
-	_methods.push_back(_findPointingPairInRow);
-	_methods.push_back(_findPointingPairInFile);
-	_methods.push_back(_findBoxLineForRow);
-	_methods.push_back(_findBoxLineForFile);
-	_methods.push_back(_findXWing1);
-	_methods.push_back(_findXWing2);
-	_methods.push_back(_findYWing);
-}
+/************************************************************************************
+solvingStrategy virtual class
+*************************************************************************************/
+class solvingStrategy {
+public:
+	solvingStrategy(Board& b, Candidates& cand, bool verbose): _b(b), _cand(cand), _verbose(verbose){};
+	virtual ~solvingStrategy(){};
+	virtual bool solve() = 0;
+protected:
+	Board& _b;
+	Candidates& _cand;
+	bool _verbose;
+	
+	void _printInfo(std::string type, std::vector<tSquares> sqList, std::vector<tValues> vList ) const;
+	void _setSquareValue(const tSquares sq, const tValues v);
+	template <class type>
+	std::vector<type> _getListFromBitset(const unsigned int n, std::vector<type> vec) const;
+	bool _containSolvedCell(std::vector<tSquares> vec) const;
+	std::set<tValues> _createUnionOfValuesFromCell(std::vector<tSquares> sqList) const;
+	bool _removeCandidatesFromCells(const std::vector<tSquares> sqList, std::set<tValues> groupValues);
+	template <class IT>
+	bool _RemoveCandidateFrom(IT sqList, tValues v);
+	std::set<tValues> _getComplementaryListOfValues(std::vector<tValues> vList) const;
+	std::vector<tSquares> _getComplementaryList(std::vector<tSquares> sqList, std::vector<tSquares> refList) const;
+};
 
-bool Solver::solve() {
-	bool solved = false;
-	_cand.fillCandidates();
-	//_cand.print();
+void solvingStrategy::_printInfo(std::string type, std::vector<tSquares> sqList, std::vector<tValues> vList ) const {
 	if (_verbose) {
-		std::cout<<"INITIAL BOARD"<<std::endl;
-		_b.print();
-		std::cout<<"---------------------------------------------"<<std::endl;
-		std::cout<<"SOLVING"<<std::endl;
-	}
-	bool stepPerformed = false;
-	do {
-		//std::cout<<"Performing STEP..."<<std::endl;
-		stepPerformed = false;
-		for (auto m: _methods) {
-			stepPerformed = (this->*m)();
-			if (stepPerformed) {
-				break;
+		std::cout<<"...FOUND "<<type<<" at ";
+		for (auto & sq: sqList) {
+			std::cout<< sq;
+			if (&sq != &sqList.back()) {
+				std::cout<<", ";
 			}
 		}
-	}
-	while (stepPerformed);
-	
-	if(_isSolved()) {
-		if (_verbose) {
-			std::cout<<"SOLVED"<<std::endl;
-			std::cout<<"---------------------------------------------"<<std::endl;
+		std::cout<<" values: (";
+		for (auto& v: vList) {
+			std::cout<< v;
+			if (&v != &vList.back()) {
+				std::cout<<", ";
+			}
 		}
-		solved = true;
-		
-	} else {
-		if (_verbose) {
-			std::cout<<"UNSOLVED"<<std::endl;
-			std::cout<<"---------------------------------------------"<<std::endl;
-		}
-		solved = false;
+		std::cout<<")"<<std::endl;
 	}
-
-	
-	if (_verbose) {
-		std::cout<<"FINAL BOARD"<<std::endl;
-		_b.print();
-	}
-	return solved;
-	
 }
 
-void Solver::_setSquareValue(const tSquares sq, const tValues v) {
+void solvingStrategy::_setSquareValue(const tSquares sq, const tValues v) {
 	assert(sq < squareNumber && sq >= startSquare);
 	assert(v >= VALUE_1 && v <= VALUE_9);
 	_b.setSquareValue(sq, v);
@@ -117,7 +96,89 @@ void Solver::_setSquareValue(const tSquares sq, const tValues v) {
 	}
 }
 
-bool Solver::_findSingle() {
+template <class type>
+std::vector<type> solvingStrategy::_getListFromBitset(const unsigned int n, std::vector<type> vec) const {
+	//convert in a list of index
+	std::bitset<9> bs(n);
+	//get list of squares
+	std::vector<type> sqList;
+			
+	for (std::size_t idx = 0; idx < bs.size(); ++idx) {
+		if (bs[idx] != 0) {
+			sqList.push_back(vec[idx]);
+		}
+	}
+	return sqList;
+}
+
+bool solvingStrategy::_containSolvedCell(std::vector<tSquares> vec) const {
+	bool containsSolvedCells = false;
+	for (auto sq: vec) {
+		if( _b.getSquareValue(sq) != VALUE_NONE) {containsSolvedCells = true;}
+	}
+	return containsSolvedCells;
+}
+
+std::set<tValues> solvingStrategy::_createUnionOfValuesFromCell(std::vector<tSquares> sqList) const {
+	std::set<tValues> groupValues;
+	for (auto sq: sqList) {
+		auto& cand = _cand.get(sq);
+		for (auto v: cand ) {
+			groupValues.insert(v);
+		}
+	}
+	return groupValues;
+}
+
+bool solvingStrategy::_removeCandidatesFromCells(const std::vector<tSquares> sqList, std::set<tValues> groupValues) {
+	bool candidatesChanged = false;
+	for (auto v: groupValues) {
+		candidatesChanged |= _RemoveCandidateFrom(sqList, v);
+	}
+	return candidatesChanged;
+}
+
+template <class IT>
+bool solvingStrategy::_RemoveCandidateFrom(IT sqList, tValues v) {
+	bool modified = false;
+	for (auto sq: sqList) { 
+		auto x =  _cand.remove(sq, v);
+		modified |= x;
+		/*if(x)std::cout<<"removed "<<C<<" from "<<sq<<std::endl;*/
+	}
+	return modified;
+}
+
+std::set<tValues> solvingStrategy::_getComplementaryListOfValues(std::vector<tValues> vList) const {
+	std::set<tValues> complementaryValueList;
+	for(auto v: squaresIterator::value) {
+		if (std::find(vList.begin(), vList.end(), v) == vList.end()) {
+			complementaryValueList.insert(v);
+		}
+	}
+	return complementaryValueList;
+}
+
+std::vector<tSquares> solvingStrategy::_getComplementaryList(std::vector<tSquares> sqList, std::vector<tSquares> refList) const {
+	std::vector<tSquares> complSquares;
+	for (auto sq: refList) { 
+		if (std::find(sqList.begin(), sqList.end(), sq) == sqList.end()) {
+			complSquares.push_back(sq);
+		}
+	}
+	return complSquares;
+}
+
+/************************************************************************************
+single strategy class
+*************************************************************************************/
+class singleStrategy : public solvingStrategy {
+public:
+	singleStrategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy(b, cand, verbose){};
+	bool solve();
+};
+
+bool singleStrategy::solve() {
 	//std::cout<<"Searching for solved cells..."<<std::endl;
 	for (auto sq: squaresIterator::squares) {
 		if (_cand.getSize(sq) == 1) {
@@ -130,14 +191,27 @@ bool Solver::_findSingle() {
 	return false;
 }
 
+/************************************************************************************
+hidden single strategy class
+*************************************************************************************/
 template <class IT, class IT2>
-bool Solver::_findHiddenSingleIn(IT it, IT2 it2) {
-	
-	for (const auto r: it) {
+class hiddenSingleStrategy: public solvingStrategy {
+public:
+	hiddenSingleStrategy(Board& b, Candidates& cand, bool verbose, IT it, IT2 it2) : solvingStrategy(b, cand, verbose), _it(it), _it2(it2){};
+	bool solve();
+private:
+	IT _it;
+	IT2 _it2;
+};
+
+template <class IT, class IT2>
+bool hiddenSingleStrategy<IT, IT2>::solve() {
+	//std::cout<<"Searching for hidden single in ????"<<std::endl;
+	for (const auto r: _it) {
 		for (const auto v: squaresIterator::value) {
 			unsigned int count = 0;
 			tSquares singleSq = squareNumber;
-			for( const auto sq: it2[r]) {
+			for( const auto sq: _it2[r]) {
 				if (_cand.contains(sq, v)) {
 					++count;
 					singleSq = sq;
@@ -153,73 +227,28 @@ bool Solver::_findHiddenSingleIn(IT it, IT2 it2) {
 	return false;
 }
 
-bool Solver::_findHiddenSingleInRow() {
-	//std::cout<<"Searching for hidden single in rows"<<std::endl;
-	return _findHiddenSingleIn<std::array<tRows, rowNumber>, std::array<std::vector<tSquares>, rowNumber>>(squaresIterator::row, squaresIterator::rows);
-}
-
-bool Solver::_findHiddenSingleInFile() {
-	//std::cout<<"Searching for hidden single in files"<<std::endl;
-	return _findHiddenSingleIn<std::array<tFiles, fileNumber>, std::array<std::vector<tSquares>, fileNumber>>(squaresIterator::file, squaresIterator::files);
-}
-
-bool Solver::_findHiddenSingleInBox() {
-	//std::cout<<"Searching for hidden single boxes"<<std::endl;
-	return _findHiddenSingleIn<std::array<tBoxes, boxNumber>, std::array<std::vector<tSquares>, boxNumber>>(squaresIterator::box, squaresIterator::boxes);
-}
-
-template <class type>
-std::vector<type> Solver::_getListFromBitset(const unsigned int n, std::vector<type> vec) const {
-	//convert in a list of index
-	std::bitset<9> bs(n);
-	//get list of squares
-	std::vector<type> sqList;
-			
-	for (std::size_t idx = 0; idx < bs.size(); ++idx) {
-		if (bs[idx] != 0) {
-			sqList.push_back(vec[idx]);
-		}
-	}
-	return sqList;
-}
-
-bool Solver::_containSolvedCell(std::vector<tSquares> vec) const {
-	bool containsSolvedCells = false;
-	for (auto sq: vec) {
-		if( _b.getSquareValue(sq) != VALUE_NONE) {containsSolvedCells = true;}
-	}
-	return containsSolvedCells;
-}
-
-std::set<tValues> Solver::_createUnionOfValuesFromCell(std::vector<tSquares> sqList) const {
-	std::set<tValues> groupValues;
-	for (auto sq: sqList) {
-		auto& cand = _cand.get(sq);
-		for (auto v: cand ) {
-			groupValues.insert(v);
-		}
-	}
-	return groupValues;
-}
-
-bool Solver::_removeCandidatesFromCells(const std::vector<tSquares> sqList, std::set<tValues> groupValues) {
-	bool candidatesChanged = false;
-	for (auto v: groupValues) {
-		candidatesChanged |= _RemoveCandidateFrom(sqList, v);
-	}
-	return candidatesChanged;
-}
+/************************************************************************************
+naked strategy class
+*************************************************************************************/
+template <class IT, class IT2>
+class nakedStrategy: public solvingStrategy {
+public:
+	nakedStrategy(Board& b, Candidates& cand, bool verbose, IT it, IT2 it2) : solvingStrategy(b, cand, verbose), _it(it), _it2(it2){};
+	bool solve();
+private:
+	IT _it;
+	IT2 _it2;
+};
 
 template <class IT, class IT2>
-bool Solver::_findNakedIn(IT it, IT2 it2) {
-	
-	for (const auto b: it) {
+bool nakedStrategy<IT, IT2>::solve() {
+	for (const auto b: _it) {
 		
 		// for all combiantion of 9 squares
 		for (unsigned int n = 0; n < 512; ++n) {
 			
 			//convert bitset to vector of squares
-			auto sqList = _getListFromBitset<tSquares>(n, it2[b]);
+			auto sqList = _getListFromBitset<tSquares>(n, _it2[b]);
 			
 			//check that the combination doesn't contain solved cells
 			if (!_containSolvedCell(sqList)) {
@@ -232,7 +261,7 @@ bool Solver::_findNakedIn(IT it, IT2 it2) {
 					// found a nake group. let's try so simplify
 					
 					// for all the squares outside sqList
-					if (_removeCandidatesFromCells(_getComplementaryList(sqList, it2[b]), groupValues)) {
+					if (_removeCandidatesFromCells(_getComplementaryList(sqList, _it2[b]), groupValues)) {
 						_printInfo("naked group", sqList, std::vector<tValues>(groupValues.begin(),groupValues.end()));
 						return true;
 					}
@@ -243,27 +272,23 @@ bool Solver::_findNakedIn(IT it, IT2 it2) {
 	return false;
 }
 
-bool Solver::_findNakedInRow() {
-	//std::cout<<"Searching for naked in rows"<<std::endl;
-	return _findNakedIn<std::array<tRows, rowNumber>, std::array<std::vector<tSquares>, rowNumber>>(squaresIterator::row, squaresIterator::rows);
-}
-
-bool Solver::_findNakedInFile() {
-	//std::cout<<"Searching for naked in files"<<std::endl;
-	return _findNakedIn<std::array<tFiles, fileNumber>, std::array<std::vector<tSquares>, fileNumber>>(squaresIterator::file, squaresIterator::files);
-}
-
-bool Solver::_findNakedInBox() {
-	//std::cout<<"Searching for naked in boxes"<<std::endl;
-	return _findNakedIn<std::array<tBoxes, boxNumber>, std::array<std::vector<tSquares>, boxNumber>>(squaresIterator::box, squaresIterator::boxes);
-}
-
+/************************************************************************************
+hidden strategy class
+*************************************************************************************/
+template <class IT, class IT2>
+class hiddenStrategy: public solvingStrategy {
+public:
+	hiddenStrategy(Board& b, Candidates& cand, bool verbose, IT it, IT2 it2) : solvingStrategy(b, cand, verbose), _it(it), _it2(it2){};
+	bool solve();
+private:
+	IT _it;
+	IT2 _it2;
+};
 
 template <class IT, class IT2>
-bool Solver::_findHiddenIn(IT it, IT2 it2) {
-	
+bool hiddenStrategy<IT, IT2>::solve() {
 	// for all the units
-	for (const auto b: it) {
+	for (const auto b: _it) {
 		
 		// for all combiantion of 9 values
 		for (unsigned int n = 0; n < 512; ++n) {
@@ -276,7 +301,7 @@ bool Solver::_findHiddenIn(IT it, IT2 it2) {
 			
 			//get squareList not solved and non containing any of the values in candidates
 			std::set<tValues> foundValues;
-			for (auto sq: it2[b]) {
+			for (auto sq: _it2[b]) {
 				auto cand = _cand.get(sq);
 				bool contain = false;
 				for (auto v: valueList) {
@@ -293,7 +318,7 @@ bool Solver::_findHiddenIn(IT it, IT2 it2) {
 			if (sqList.size() == valueList.size() && sqList.size() != 0 && foundValues.size() == valueList.size()) {
 				// found a hidden group. let's try so simplify
 				// remove values from complementary value list
-				if (_removeCandidatesFromCells(sqList, _getComplementaryList(valueList))) {
+				if (_removeCandidatesFromCells(sqList, _getComplementaryListOfValues(valueList))) {
 					_printInfo("hidden group", sqList, valueList);
 					return true;
 				}
@@ -303,30 +328,28 @@ bool Solver::_findHiddenIn(IT it, IT2 it2) {
 	return false;
 }
 
-bool Solver::_findHiddenInRow() {
-	//std::cout<<"Searching for hidden in rows"<<std::endl;
-	return _findHiddenIn<std::array<tRows, rowNumber>, std::array<std::vector<tSquares>, rowNumber>>(squaresIterator::row, squaresIterator::rows);
-}
-
-bool Solver::_findHiddenInFile() {
-	//std::cout<<"Searching for hidden in files"<<std::endl;
-	return _findHiddenIn<std::array<tFiles, fileNumber>, std::array<std::vector<tSquares>, fileNumber>>(squaresIterator::file, squaresIterator::files);
-}
-
-bool Solver::_findHiddenInBox() {
-	//std::cout<<"Searching for hidden in boxes"<<std::endl;
-	return _findHiddenIn<std::array<tBoxes, boxNumber>, std::array<std::vector<tSquares>, boxNumber>>(squaresIterator::box, squaresIterator::boxes);
-}
+/************************************************************************************
+pointing pair strategy class
+*************************************************************************************/
+template <class IT, class IT2>
+class pointingPairStrategy: public solvingStrategy {
+public:
+	pointingPairStrategy(Board& b, Candidates& cand, bool verbose, IT it, IT2 it2) : solvingStrategy(b, cand, verbose), _it(it), _it2(it2){};
+	bool solve();
+private:
+	IT _it;
+	IT2 _it2;
+};
 
 template <class IT, class IT2>
-bool Solver::_findPointingPairIn(IT it, IT2 it2) {
+bool pointingPairStrategy<IT, IT2>::solve() {
 	// for all the units
-	for (const auto b: it) {
+	for (const auto b: _it) {
 		// for all the values
 		for(auto v: squaresIterator::value) {
 			// find all the squares containing value as candidate
 			std::vector<tSquares> squareList;
-			for(auto sq: it2[b]) {
+			for(auto sq: _it2[b]) {
 				if (_cand.contains(sq, v)) {
 					squareList.push_back(sq);
 				}
@@ -343,18 +366,18 @@ bool Solver::_findPointingPairIn(IT it, IT2 it2) {
 		}
 	}
 	return false;
-		
 }
 
-bool Solver::_findPointingPairInRow() {
-	return _findPointingPairIn<std::array<tRows, rowNumber>, std::array<std::vector<tSquares>, rowNumber>>(squaresIterator::row, squaresIterator::rows);
-}
-bool Solver::_findPointingPairInFile() {
-	return _findPointingPairIn<std::array<tFiles, fileNumber>, std::array<std::vector<tSquares>, fileNumber>>(squaresIterator::file, squaresIterator::files);
-}
+/************************************************************************************
+box line strategy class
+*************************************************************************************/
+class boxLineForRowStrategy : public solvingStrategy {
+public:
+	boxLineForRowStrategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy(b, cand, verbose){};
+	bool solve();
+};
 
-
-bool Solver::_findBoxLineForRow() {
+bool boxLineForRowStrategy::solve() {
 	// for all boxes
 	for (const auto b: squaresIterator::box) {
 		// for all the values
@@ -378,7 +401,18 @@ bool Solver::_findBoxLineForRow() {
 	}
 	return false;
 }
-bool Solver::_findBoxLineForFile() {
+
+/************************************************************************************
+box line strategy class
+*************************************************************************************/
+// todo unify with box line for row
+class boxLineForLineStrategy : public solvingStrategy {
+public:
+	boxLineForLineStrategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy(b, cand, verbose){};
+	bool solve();
+};
+
+bool boxLineForLineStrategy::solve() {
 	// for all boxes
 	for (const auto b: squaresIterator::box) {
 		// for all the values
@@ -403,31 +437,17 @@ bool Solver::_findBoxLineForFile() {
 	return false;
 }
 
-void Solver::_printInfo(std::string type, std::vector<tSquares> sqList, std::vector<tValues> vList ) const {
-	if (_verbose) {
-		std::cout<<"...FOUND "<<type<<" at ";
-		for (auto & sq: sqList) {
-			std::cout<< sq;
-			if (&sq != &sqList.back()) {
-				std::cout<<", ";
-			}
-		}
-		std::cout<<" values: (";
-		for (auto& v: vList) {
-			std::cout<< v;
-			if (&v != &vList.back()) {
-				std::cout<<", ";
-			}
-		}
-		std::cout<<")"<<std::endl;
-	}
-}
+/************************************************************************************
+xwing1 strategy class
+*************************************************************************************/
 
-bool Solver::_isSolved() {
-	return !_b.contains(std::vector<tSquares>(squaresIterator::squares.begin(), squaresIterator::squares.end()), VALUE_NONE);
-}
+class xWing1Strategy : public solvingStrategy {
+public:
+	xWing1Strategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy(b, cand, verbose){};
+	bool solve();
+};
 
-bool Solver::_findXWing1() {
+bool xWing1Strategy::solve() {
 	// for all the values
 	//std::cout<<"testing xwing"<<std::endl;
 	for(auto v: squaresIterator::value) {
@@ -493,7 +513,17 @@ bool Solver::_findXWing1() {
 	return false;
 }
 
-bool Solver::_findXWing2() {
+/************************************************************************************
+xwing2 strategy class
+*************************************************************************************/
+
+class xWing2Strategy : public solvingStrategy {
+public:
+	xWing2Strategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy(b, cand, verbose){};
+	bool solve();
+};
+
+bool xWing2Strategy::solve() {
 	// for all the values
 	//std::cout<<"testing xwing"<<std::endl;
 	for(auto v: squaresIterator::value) {
@@ -559,7 +589,17 @@ bool Solver::_findXWing2() {
 	return false;
 }
 
-bool Solver::_findYWing() {
+/************************************************************************************
+ywing strategy class
+*************************************************************************************/
+
+class yWingStrategy : public solvingStrategy {
+public:
+	yWingStrategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy(b, cand, verbose){};
+	bool solve();
+};
+
+bool yWingStrategy::solve() {
 	/*std::cout<<"testing ywing"<<std::endl;*/
 	std::vector<tSquares> sqList;
 	for( auto sq: squaresIterator::squares)
@@ -639,33 +679,105 @@ bool Solver::_findYWing() {
 	return false;
 }
 
-template <class IT>
-bool Solver::_RemoveCandidateFrom(IT sqList, tValues v) {
-	bool modified = false;
-	for (auto sq: sqList) { 
-		auto x =  _cand.remove(sq, v);
-		modified |= x;
-		/*if(x)std::cout<<"removed "<<C<<" from "<<sq<<std::endl;*/
-	}
-	return modified;
-}
+/************************************************************************************
+solver private implementation
+*************************************************************************************/
+class Solver::impl
+{
+public:
+	impl (Board& b, bool verbose): _b(b), _cand(b), _verbose(verbose) {
+		
+		_solverStrategies.emplace_back(new singleStrategy(_b, _cand, _verbose));
+		
+		_solverStrategies.emplace_back(new hiddenSingleStrategy<rowIterator, rowsIterator>(_b, _cand, _verbose, squaresIterator::row, squaresIterator::rows));
+		_solverStrategies.emplace_back(new hiddenSingleStrategy<fileIterator, std::array<std::vector<tSquares>, fileNumber>>(_b, _cand, _verbose, squaresIterator::file, squaresIterator::files));
+		_solverStrategies.emplace_back(new hiddenSingleStrategy<boxIterator, std::array<std::vector<tSquares>, boxNumber>>(_b, _cand, _verbose, squaresIterator::box, squaresIterator::boxes));
+		
+		_solverStrategies.emplace_back(new nakedStrategy<rowIterator, rowsIterator>(_b, _cand, _verbose, squaresIterator::row, squaresIterator::rows));
+		_solverStrategies.emplace_back(new nakedStrategy<fileIterator, filesIterator>(_b, _cand, _verbose, squaresIterator::file, squaresIterator::files));
+		_solverStrategies.emplace_back(new nakedStrategy<boxIterator, boxesIterator>(_b, _cand, _verbose, squaresIterator::box, squaresIterator::boxes));
+		
+		_solverStrategies.emplace_back(new hiddenStrategy<rowIterator, rowsIterator>(_b, _cand, _verbose, squaresIterator::row, squaresIterator::rows));
+		_solverStrategies.emplace_back(new hiddenStrategy<fileIterator, filesIterator>(_b, _cand, _verbose, squaresIterator::file, squaresIterator::files));
+		_solverStrategies.emplace_back(new hiddenStrategy<boxIterator, boxesIterator>(_b, _cand, _verbose, squaresIterator::box, squaresIterator::boxes));
+		
+		_solverStrategies.emplace_back(new pointingPairStrategy<rowIterator, rowsIterator>(_b, _cand, _verbose, squaresIterator::row, squaresIterator::rows));
+		_solverStrategies.emplace_back(new pointingPairStrategy<fileIterator, filesIterator>(_b, _cand, _verbose, squaresIterator::file, squaresIterator::files));
+		
+		_solverStrategies.emplace_back(new boxLineForRowStrategy(_b, _cand, _verbose));
+		_solverStrategies.emplace_back(new boxLineForLineStrategy(_b, _cand, _verbose));
+		
+		_solverStrategies.emplace_back(new xWing1Strategy(_b, _cand, _verbose));
+		_solverStrategies.emplace_back(new xWing2Strategy(_b, _cand, _verbose));
+		_solverStrategies.emplace_back(new yWingStrategy(_b, _cand, _verbose));
+		
+		
+	};
+	bool solve();
+private:
+	Board& _b;
+	Candidates _cand;
+	bool _verbose;	
+	
+	std::list<std::unique_ptr<solvingStrategy>> _solverStrategies;
+	bool _isSolved();
+};
 
-std::set<tValues> Solver::_getComplementaryList(std::vector<tValues> vList) const {
-	std::set<tValues> complementaryValueList;
-	for(auto v: squaresIterator::value) {
-		if (std::find(vList.begin(), vList.end(), v) == vList.end()) {
-			complementaryValueList.insert(v);
+bool Solver::impl::solve() {
+	bool solved = false;
+	_cand.fillCandidates();
+	//_cand.print();
+	if (_verbose) {
+		std::cout<<"INITIAL BOARD"<<std::endl;
+		_b.print();
+		std::cout<<"---------------------------------------------"<<std::endl;
+		std::cout<<"SOLVING"<<std::endl;
+	}
+	bool stepPerformed = false;
+	do {
+		//std::cout<<"Performing STEP..."<<std::endl;
+		stepPerformed = false;
+		for (auto& m: _solverStrategies) {
+			stepPerformed = m->solve();
+			if (stepPerformed) {
+				break;
+			}
 		}
 	}
-	return complementaryValueList;
+	while (stepPerformed);
+	
+	if(_isSolved()) {
+		if (_verbose) {
+			std::cout<<"SOLVED"<<std::endl;
+			std::cout<<"---------------------------------------------"<<std::endl;
+		}
+		solved = true;
+		
+	} else {
+		if (_verbose) {
+			std::cout<<"UNSOLVED"<<std::endl;
+			std::cout<<"---------------------------------------------"<<std::endl;
+		}
+		solved = false;
+	}
+
+	
+	if (_verbose) {
+		std::cout<<"FINAL BOARD"<<std::endl;
+		_b.print();
+	}
+	return solved;
 }
 
-std::vector<tSquares> Solver::_getComplementaryList(std::vector<tSquares> sqList, std::vector<tSquares> refList) const {
-	std::vector<tSquares> complSquares;
-	for (auto sq: refList) { 
-		if (std::find(sqList.begin(), sqList.end(), sq) == sqList.end()) {
-			complSquares.push_back(sq);
-		}
-	}
-	return complSquares;
+bool Solver::impl::_isSolved() {
+	return !_b.contains(std::vector<tSquares>(squaresIterator::squares.begin(), squaresIterator::squares.end()), VALUE_NONE);
 }
+
+/************************************************************************************
+Solver implementation
+*************************************************************************************/
+Solver::Solver (Board& b, bool verbose): _pimpl{std::make_unique<impl>(b,verbose)}{}
+
+bool Solver::solve() {return _pimpl->solve();}
+
+Solver::~Solver() = default;
