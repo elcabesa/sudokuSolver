@@ -26,36 +26,38 @@ bool hiddenStrategy<IT, IT2>::solve() {
 	for (const auto b: _it) {
 		
 		// for all combiantion of 9 values
-		for (unsigned int n = 0; n < 512; ++n) {
+		for (unsigned int n = 1; n < 512; ++n) {
+			if( __builtin_popcount(n) < 5) { // search for at maximum group of 4
 			
-			//convert bitset to vector of values
-			std::vector<tValues> temp(squaresIterator::value.begin(), squaresIterator::value.end());
-			auto valueList = _getListFromBitset<tValues>(n, temp);
-			
-			std::vector<tSquares> sqList;
-			
-			//get squareList not solved and non containing any of the values in candidates
-			std::set<tValues> foundValues;
-			for (auto sq: _it2[b]) {
-				auto cand = _cand.get(sq);
-				bool contain = false;
-				for (auto v: valueList) {
-					if (std::find(cand.begin(),cand.end(),v) != cand.end()) {
-						contain = true;
-						foundValues.insert(v);
+				//convert bitset to vector of values
+				std::vector<tValues> temp(squaresIterator::value.begin(), squaresIterator::value.end());
+				auto valueList = _getListFromBitset<tValues>(n, temp);
+				
+				std::vector<tSquares> sqList;
+				
+				//get squareList not solved and non containing any of the values in candidates
+				std::set<tValues> foundValues;
+				for (auto sq: _it2[b]) {
+					auto cand = _cand.get(sq);
+					bool contain = false;
+					for (auto v: valueList) {
+						if (std::find(cand.begin(),cand.end(),v) != cand.end()) {
+							contain = true;
+							foundValues.insert(v);
+						}
+					}
+					if (contain) {
+						sqList.push_back(sq);
 					}
 				}
-				if (contain) {
-					sqList.push_back(sq);
-				}
-			}
-				
-			if (sqList.size() == valueList.size() && sqList.size() != 0 && foundValues.size() == valueList.size()) {
-				// found a hidden group. let's try so simplify
-				// remove values from complementary value list
-				if (_removeCandidatesFromCells(sqList, _getComplementaryListOfValues(valueList))) {
-					_printInfo("hidden group", sqList, valueList);
-					return true;
+					
+				if (sqList.size() == valueList.size() && sqList.size() != 0 && foundValues.size() == valueList.size()) {
+					// found a hidden group. let's try so simplify
+					// remove values from complementary value list
+					if (_removeCandidatesFromCells(sqList, _getComplementaryListOfValues(valueList))) {
+						_printInfo("hidden group", sqList, valueList);
+						return true;
+					}
 				}
 			}
 		}

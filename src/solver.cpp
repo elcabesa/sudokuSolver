@@ -15,9 +15,10 @@
     along with SudokuSolver.  If not, see <http://www.gnu.org/licenses/>
 */
 
-
+#include <chrono>
 #include <list>
 #include <iostream>
+#include <map>
 
 #include "board.h"
 #include "candidates.h"
@@ -40,6 +41,12 @@
 /************************************************************************************
 solver private implementation
 *************************************************************************************/
+
+struct statt{
+	unsigned long long int time = 0;
+	unsigned long long int calls = 0;
+};
+
 class Solver::impl
 {
 public:
@@ -75,10 +82,12 @@ public:
 private:
 	Board& _b;
 	Candidates _cand;
-	bool _verbose;	
+	bool _verbose;
 	
 	std::list<std::unique_ptr<solvingStrategy>> _solverStrategies;
 	bool _isSolved();
+	std::map<std::string, statt> _stats;
+
 };
 
 bool Solver::impl::solve() {
@@ -91,19 +100,22 @@ bool Solver::impl::solve() {
 		std::cout<<"---------------------------------------------"<<std::endl;
 		std::cout<<"SOLVING"<<std::endl;
 	}
-	bool stepPerformed = false;
-	do {
+	bool stepPerformed = true;
+	while(!_isSolved() && stepPerformed) {
 		//std::cout<<"Performing STEP..."<<std::endl;
 		stepPerformed = false;
 		for (auto& m: _solverStrategies) {
 			if (_verbose) std::cout << m->getName() <<std::endl;
+			std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 			stepPerformed = m->solve();
+			std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+			_stats[m->getName()].time += std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count();
+			_stats[m->getName()].calls ++;
 			if (stepPerformed) {
 				break;
 			}
 		}
 	}
-	while (stepPerformed);
 	
 	if(_isSolved()) {
 		if (_verbose) {
@@ -124,7 +136,17 @@ bool Solver::impl::solve() {
 	if (_verbose) {
 		std::cout<<"FINAL BOARD"<<std::endl;
 		_b.print();
+	
+		std::cout << "**************time report****************" << std::endl;
+		unsigned long long int tot = 0;
+		for (const auto& s: _stats) {
+			tot += s.second.time;
+		}
+		for (const auto& s: _stats) {
+			std::cout << s.first << " " << s.second.time/ 1.0e9 << "s [" << s.second.time * 100.0 / tot << "%], " << s.second.calls <<std::endl;
+		}
 	}
+	
 	return solved;
 }
 

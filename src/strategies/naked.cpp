@@ -25,28 +25,30 @@ bool nakedStrategy<IT, IT2>::solve() {
 	for (const auto b: _it) {
 		
 		// for all combiantion of 9 squares
-		for (unsigned int n = 0; n < 512; ++n) {
+		for (unsigned int n = 1; n < 512; ++n) {
+			if( __builtin_popcount(n) < 5) { // search for at maximum group of 4
 			
-			//convert bitset to vector of squares
-			auto sqList = _getListFromBitset<tSquares>(n, _it2[b]);
-			
-			//check that the combination doesn't contain solved cells
-			if (!_containSolvedCell(sqList)) {
+				//convert bitset to vector of squares
+				auto sqList = _getListFromBitset<tSquares>(n, _it2[b]);
 				
-				// for the list of cells create the union of values
-				auto groupValues = _createUnionOfValuesFromCell(sqList);
-				
-				// if the number of different values in the group is equal to thee number of squares in the bitset we have found a nake set
-				if (sqList.size() == groupValues.size()) {
-					// found a nake group. let's try so simplify
+				//check that the combination doesn't contain solved cells
+				if (!_containSolvedCell(sqList)) {
 					
-					// for all the squares outside sqList
-					if (_removeCandidatesFromCells(_getComplementaryList(sqList, _it2[b]), groupValues)) {
-						_printInfo("naked group", sqList, std::vector<tValues>(groupValues.begin(),groupValues.end()));
-						return true;
+					// for the list of cells create the union of values
+					auto groupValues = _createUnionOfValuesFromCell(sqList);
+					
+					// if the number of different values in the group is equal to thee number of squares in the bitset we have found a nake set
+					if (sqList.size() == groupValues.size()) {
+						// found a nake group. let's try so simplify
+						
+						// for all the squares outside sqList
+						if (_removeCandidatesFromCells(_getComplementaryList(sqList, _it2[b]), groupValues)) {
+							_printInfo("naked group", sqList, std::vector<tValues>(groupValues.begin(),groupValues.end()));
+							return true;
+						}
 					}
 				}
-			}	
+			}
 		}
 	}
 	return false;
