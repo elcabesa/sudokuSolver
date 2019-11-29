@@ -22,13 +22,13 @@
 
 class xWing1Strategy : public solvingStrategy {
 public:
-	xWing1Strategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy(b, cand, verbose){};
+	xWing1Strategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy("xWing1", b, cand, verbose){};
 	bool solve();
 };
 
 class xWing2Strategy : public solvingStrategy {
 public:
-	xWing2Strategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy(b, cand, verbose){};
+	xWing2Strategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy("xWing2", b, cand, verbose){};
 	bool solve();
 };
 

@@ -23,7 +23,7 @@
 template <class IT, class IT2>
 class hiddenStrategy: public solvingStrategy {
 public:
-	hiddenStrategy(Board& b, Candidates& cand, bool verbose, IT it, IT2 it2) : solvingStrategy(b, cand, verbose), _it(it), _it2(it2){};
+	hiddenStrategy(Board& b, Candidates& cand, bool verbose, IT it, IT2 it2) : solvingStrategy("hidden", b, cand, verbose), _it(it), _it2(it2){};
 	bool solve();
 private:
 	IT _it;

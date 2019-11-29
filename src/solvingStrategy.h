@@ -31,10 +31,12 @@ class Candidates;
 
 class solvingStrategy {
 public:
-	solvingStrategy(Board& b, Candidates& cand, bool verbose): _b(b), _cand(cand), _verbose(verbose){};
+	solvingStrategy(const std::string& name,Board& b, Candidates& cand, bool verbose): _name(name), _b(b), _cand(cand), _verbose(verbose){};
 	virtual ~solvingStrategy(){};
 	virtual bool solve() = 0;
+	const std::string& getName() const;
 protected:
+	const std::string _name;
 	Board& _b;
 	Candidates& _cand;
 	bool _verbose;

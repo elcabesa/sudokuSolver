@@ -22,7 +22,7 @@
 
 class singleStrategy : public solvingStrategy {
 public:
-	singleStrategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy(b, cand, verbose){};
+	singleStrategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy("single", b, cand, verbose){};
 	bool solve();
 };
 

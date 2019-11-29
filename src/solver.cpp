@@ -96,6 +96,7 @@ bool Solver::impl::solve() {
 		//std::cout<<"Performing STEP..."<<std::endl;
 		stepPerformed = false;
 		for (auto& m: _solverStrategies) {
+			if (_verbose) std::cout << m->getName() <<std::endl;
 			stepPerformed = m->solve();
 			if (stepPerformed) {
 				break;

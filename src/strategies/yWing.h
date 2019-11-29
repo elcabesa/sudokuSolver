@@ -22,7 +22,7 @@
 
 class yWingStrategy : public solvingStrategy {
 public:
-	yWingStrategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy(b, cand, verbose){};
+	yWingStrategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy("yWing", b, cand, verbose){};
 	bool solve();
 };
 

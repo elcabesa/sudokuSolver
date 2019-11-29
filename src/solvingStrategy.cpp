@@ -146,3 +146,7 @@ std::vector<tSquares> solvingStrategy::_getComplementaryList(std::vector<tSquare
 	}
 	return complSquares;
 }
+
+const std::string& solvingStrategy::getName() const {
+	return _name;
+}

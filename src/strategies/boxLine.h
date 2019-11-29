@@ -22,13 +22,13 @@
 // todo unify
 class boxLineForRowStrategy : public solvingStrategy {
 public:
-	boxLineForRowStrategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy(b, cand, verbose){};
+	boxLineForRowStrategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy("boxLineRow", b, cand, verbose){};
 	bool solve();
 };
 
 class boxLineForLineStrategy : public solvingStrategy {
 public:
-	boxLineForLineStrategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy(b, cand, verbose){};
+	boxLineForLineStrategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy("boxLineFile", b, cand, verbose){};
 	bool solve();
 };
 
