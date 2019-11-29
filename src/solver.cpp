@@ -687,29 +687,29 @@ class Solver::impl
 public:
 	impl (Board& b, bool verbose): _b(b), _cand(b), _verbose(verbose) {
 		
-		_solverStrategies.emplace_back(new singleStrategy(_b, _cand, _verbose));
+		_solverStrategies.emplace_back(std::make_unique<singleStrategy>(_b, _cand, _verbose));
 		
-		_solverStrategies.emplace_back(new hiddenSingleStrategy<rowIterator, rowsIterator>(_b, _cand, _verbose, squaresIterator::row, squaresIterator::rows));
-		_solverStrategies.emplace_back(new hiddenSingleStrategy<fileIterator, std::array<std::vector<tSquares>, fileNumber>>(_b, _cand, _verbose, squaresIterator::file, squaresIterator::files));
-		_solverStrategies.emplace_back(new hiddenSingleStrategy<boxIterator, std::array<std::vector<tSquares>, boxNumber>>(_b, _cand, _verbose, squaresIterator::box, squaresIterator::boxes));
+		_solverStrategies.emplace_back(std::make_unique<hiddenSingleStrategy<rowIterator, rowsIterator>>(_b, _cand, _verbose, squaresIterator::row, squaresIterator::rows));
+		_solverStrategies.emplace_back(std::make_unique<hiddenSingleStrategy<fileIterator, std::array<std::vector<tSquares>, fileNumber>>>(_b, _cand, _verbose, squaresIterator::file, squaresIterator::files));
+		_solverStrategies.emplace_back(std::make_unique<hiddenSingleStrategy<boxIterator, std::array<std::vector<tSquares>, boxNumber>>>(_b, _cand, _verbose, squaresIterator::box, squaresIterator::boxes));
 		
-		_solverStrategies.emplace_back(new nakedStrategy<rowIterator, rowsIterator>(_b, _cand, _verbose, squaresIterator::row, squaresIterator::rows));
-		_solverStrategies.emplace_back(new nakedStrategy<fileIterator, filesIterator>(_b, _cand, _verbose, squaresIterator::file, squaresIterator::files));
-		_solverStrategies.emplace_back(new nakedStrategy<boxIterator, boxesIterator>(_b, _cand, _verbose, squaresIterator::box, squaresIterator::boxes));
+		_solverStrategies.emplace_back(std::make_unique<nakedStrategy<rowIterator, rowsIterator>>(_b, _cand, _verbose, squaresIterator::row, squaresIterator::rows));
+		_solverStrategies.emplace_back(std::make_unique<nakedStrategy<fileIterator, filesIterator>>(_b, _cand, _verbose, squaresIterator::file, squaresIterator::files));
+		_solverStrategies.emplace_back(std::make_unique<nakedStrategy<boxIterator, boxesIterator>>(_b, _cand, _verbose, squaresIterator::box, squaresIterator::boxes));
 		
-		_solverStrategies.emplace_back(new hiddenStrategy<rowIterator, rowsIterator>(_b, _cand, _verbose, squaresIterator::row, squaresIterator::rows));
-		_solverStrategies.emplace_back(new hiddenStrategy<fileIterator, filesIterator>(_b, _cand, _verbose, squaresIterator::file, squaresIterator::files));
-		_solverStrategies.emplace_back(new hiddenStrategy<boxIterator, boxesIterator>(_b, _cand, _verbose, squaresIterator::box, squaresIterator::boxes));
+		_solverStrategies.emplace_back(std::make_unique<hiddenStrategy<rowIterator, rowsIterator>>(_b, _cand, _verbose, squaresIterator::row, squaresIterator::rows));
+		_solverStrategies.emplace_back(std::make_unique<hiddenStrategy<fileIterator, filesIterator>>(_b, _cand, _verbose, squaresIterator::file, squaresIterator::files));
+		_solverStrategies.emplace_back(std::make_unique<hiddenStrategy<boxIterator, boxesIterator>>(_b, _cand, _verbose, squaresIterator::box, squaresIterator::boxes));
 		
-		_solverStrategies.emplace_back(new pointingPairStrategy<rowIterator, rowsIterator>(_b, _cand, _verbose, squaresIterator::row, squaresIterator::rows));
-		_solverStrategies.emplace_back(new pointingPairStrategy<fileIterator, filesIterator>(_b, _cand, _verbose, squaresIterator::file, squaresIterator::files));
+		_solverStrategies.emplace_back(std::make_unique<pointingPairStrategy<rowIterator, rowsIterator>>(_b, _cand, _verbose, squaresIterator::row, squaresIterator::rows));
+		_solverStrategies.emplace_back(std::make_unique<pointingPairStrategy<fileIterator, filesIterator>>(_b, _cand, _verbose, squaresIterator::file, squaresIterator::files));
 		
-		_solverStrategies.emplace_back(new boxLineForRowStrategy(_b, _cand, _verbose));
-		_solverStrategies.emplace_back(new boxLineForLineStrategy(_b, _cand, _verbose));
+		_solverStrategies.emplace_back(std::make_unique<boxLineForRowStrategy>(_b, _cand, _verbose));
+		_solverStrategies.emplace_back(std::make_unique<boxLineForLineStrategy>(_b, _cand, _verbose));
 		
-		_solverStrategies.emplace_back(new xWing1Strategy(_b, _cand, _verbose));
-		_solverStrategies.emplace_back(new xWing2Strategy(_b, _cand, _verbose));
-		_solverStrategies.emplace_back(new yWingStrategy(_b, _cand, _verbose));
+		_solverStrategies.emplace_back(std::make_unique<xWing1Strategy>(_b, _cand, _verbose));
+		_solverStrategies.emplace_back(std::make_unique<xWing2Strategy>(_b, _cand, _verbose));
+		_solverStrategies.emplace_back(std::make_unique<yWingStrategy>(_b, _cand, _verbose));
 		
 		
 	};
