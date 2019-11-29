@@ -25,110 +25,12 @@
 #include "candidates.h"
 #include "iterators.h"
 #include "solver.h"
+
 #include "solvingStrategy.h"
 
-/************************************************************************************
-single strategy class
-*************************************************************************************/
-class singleStrategy : public solvingStrategy {
-public:
-	singleStrategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy(b, cand, verbose){};
-	bool solve();
-};
-
-bool singleStrategy::solve() {
-	//std::cout<<"Searching for solved cells..."<<std::endl;
-	for (auto sq: squaresIterator::squares) {
-		if (_cand.getSize(sq) == 1) {
-			auto v = _cand.get(sq)[0];
-			_printInfo("single", std::vector<tSquares>(1, sq), std::vector<tValues>(1, v));
-			_setSquareValue(sq, v);
-			return true;
-		}
-	}
-	return false;
-}
-
-/************************************************************************************
-hidden single strategy class
-*************************************************************************************/
-template <class IT, class IT2>
-class hiddenSingleStrategy: public solvingStrategy {
-public:
-	hiddenSingleStrategy(Board& b, Candidates& cand, bool verbose, IT it, IT2 it2) : solvingStrategy(b, cand, verbose), _it(it), _it2(it2){};
-	bool solve();
-private:
-	IT _it;
-	IT2 _it2;
-};
-
-template <class IT, class IT2>
-bool hiddenSingleStrategy<IT, IT2>::solve() {
-	//std::cout<<"Searching for hidden single in ????"<<std::endl;
-	for (const auto r: _it) {
-		for (const auto v: squaresIterator::value) {
-			unsigned int count = 0;
-			tSquares singleSq = squareNumber;
-			for( const auto sq: _it2[r]) {
-				if (_cand.contains(sq, v)) {
-					++count;
-					singleSq = sq;
-				}
-			}
-			if (count == 1) {
-				_printInfo("hidden single", std::vector<tSquares>(1, singleSq), std::vector<tValues>(1, v));
-				_setSquareValue(singleSq, v);
-				return true;
-			}				
-		}
-	}
-	return false;
-}
-
-/************************************************************************************
-naked strategy class
-*************************************************************************************/
-template <class IT, class IT2>
-class nakedStrategy: public solvingStrategy {
-public:
-	nakedStrategy(Board& b, Candidates& cand, bool verbose, IT it, IT2 it2) : solvingStrategy(b, cand, verbose), _it(it), _it2(it2){};
-	bool solve();
-private:
-	IT _it;
-	IT2 _it2;
-};
-
-template <class IT, class IT2>
-bool nakedStrategy<IT, IT2>::solve() {
-	for (const auto b: _it) {
-		
-		// for all combiantion of 9 squares
-		for (unsigned int n = 0; n < 512; ++n) {
-			
-			//convert bitset to vector of squares
-			auto sqList = _getListFromBitset<tSquares>(n, _it2[b]);
-			
-			//check that the combination doesn't contain solved cells
-			if (!_containSolvedCell(sqList)) {
-				
-				// for the list of cells create the union of values
-				auto groupValues = _createUnionOfValuesFromCell(sqList);
-				
-				// if the number of different values in the group is equal to thee number of squares in the bitset we have found a nake set
-				if (sqList.size() == groupValues.size()) {
-					// found a nake group. let's try so simplify
-					
-					// for all the squares outside sqList
-					if (_removeCandidatesFromCells(_getComplementaryList(sqList, _it2[b]), groupValues)) {
-						_printInfo("naked group", sqList, std::vector<tValues>(groupValues.begin(),groupValues.end()));
-						return true;
-					}
-				}
-			}	
-		}
-	}
-	return false;
-}
+#include "single.h"
+#include "hiddenSingle.h"
+#include "naked.h"
 
 /************************************************************************************
 hidden strategy class
