@@ -15,33 +15,19 @@
     along with SudokuSolver.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef _SOLVER_H
-#define _SOLVER_H
+#ifndef _HIDDEN_SINGLE_H
+#define _HIDDEN_SINGLE_H
 
-#include <memory>
-#include <set>
-#include <string>
+#include "solvingStrategy.h"
 
-#include "candidates.h"
-#include "value.h"
-
-class Board;
-
-class Solver {
+template <class IT, class IT2>
+class hiddenSingleStrategy: public solvingStrategy {
 public:
-	Solver (Board& b, bool verbose = true);
-	~Solver();
-	
-	Solver( const Solver& other ) = delete;
-	Solver& operator=(const Solver& other) = delete;
-	Solver(Solver&&) =delete;
-	Solver& operator=(Solver&&) = delete;
-	
+	hiddenSingleStrategy(Board& b, Candidates& cand, bool verbose, IT it, IT2 it2) : solvingStrategy("hiddenSingle", b, cand, verbose), _it(it), _it2(it2){};
 	bool solve();
 private:
-	class impl;
-	std::unique_ptr<impl> _pimpl;
+	IT _it;
+	IT2 _it2;
 };
-
 
 #endif

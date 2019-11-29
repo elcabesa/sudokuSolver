@@ -15,33 +15,21 @@
     along with SudokuSolver.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef _SOLVER_H
-#define _SOLVER_H
+#ifndef _BOX_LINE_H
+#define _BOX_LINE_H
 
-#include <memory>
-#include <set>
-#include <string>
-
-#include "candidates.h"
-#include "value.h"
-
-class Board;
-
-class Solver {
+#include "solvingStrategy.h"
+// todo unify
+class boxLineForRowStrategy : public solvingStrategy {
 public:
-	Solver (Board& b, bool verbose = true);
-	~Solver();
-	
-	Solver( const Solver& other ) = delete;
-	Solver& operator=(const Solver& other) = delete;
-	Solver(Solver&&) =delete;
-	Solver& operator=(Solver&&) = delete;
-	
+	boxLineForRowStrategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy("boxLineRow", b, cand, verbose){};
 	bool solve();
-private:
-	class impl;
-	std::unique_ptr<impl> _pimpl;
 };
 
+class boxLineForLineStrategy : public solvingStrategy {
+public:
+	boxLineForLineStrategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy("boxLineFile", b, cand, verbose){};
+	bool solve();
+};
 
 #endif

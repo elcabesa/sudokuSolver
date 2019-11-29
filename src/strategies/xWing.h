@@ -15,33 +15,21 @@
     along with SudokuSolver.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef _SOLVER_H
-#define _SOLVER_H
+#ifndef _X_WING_H
+#define _X_WING_H
 
-#include <memory>
-#include <set>
-#include <string>
+#include "solvingStrategy.h"
 
-#include "candidates.h"
-#include "value.h"
-
-class Board;
-
-class Solver {
+class xWing1Strategy : public solvingStrategy {
 public:
-	Solver (Board& b, bool verbose = true);
-	~Solver();
-	
-	Solver( const Solver& other ) = delete;
-	Solver& operator=(const Solver& other) = delete;
-	Solver(Solver&&) =delete;
-	Solver& operator=(Solver&&) = delete;
-	
+	xWing1Strategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy("xWing1", b, cand, verbose){};
 	bool solve();
-private:
-	class impl;
-	std::unique_ptr<impl> _pimpl;
 };
 
+class xWing2Strategy : public solvingStrategy {
+public:
+	xWing2Strategy(Board& b, Candidates& cand, bool verbose) : solvingStrategy("xWing2", b, cand, verbose){};
+	bool solve();
+};
 
 #endif

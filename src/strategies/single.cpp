@@ -15,33 +15,20 @@
     along with SudokuSolver.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#ifndef _SOLVER_H
-#define _SOLVER_H
-
-#include <memory>
-#include <set>
-#include <string>
-
+#include "board.h"
 #include "candidates.h"
-#include "value.h"
+#include "iterators.h"
+#include "single.h"
 
-class Board;
-
-class Solver {
-public:
-	Solver (Board& b, bool verbose = true);
-	~Solver();
-	
-	Solver( const Solver& other ) = delete;
-	Solver& operator=(const Solver& other) = delete;
-	Solver(Solver&&) =delete;
-	Solver& operator=(Solver&&) = delete;
-	
-	bool solve();
-private:
-	class impl;
-	std::unique_ptr<impl> _pimpl;
-};
-
-
-#endif
+bool singleStrategy::solve() {
+	//std::cout<<"Searching for solved cells..."<<std::endl;
+	for (auto sq: squaresIterator::squares) {
+		if (_cand.getSize(sq) == 1) {
+			auto v = _cand.get(sq)[0];
+			_printInfo("single", std::vector<tSquares>(1, sq), std::vector<tValues>(1, v));
+			_setSquareValue(sq, v);
+			return true;
+		}
+	}
+	return false;
+}
