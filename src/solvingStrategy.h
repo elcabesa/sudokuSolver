@@ -60,6 +60,8 @@ protected:
 	std::set<tValues> _getComplementaryListOfValues(std::vector<tValues> vList) const;
 	
 	std::vector<tSquares> _getComplementaryList(std::vector<tSquares> sqList, std::vector<tSquares> refList) const;
+	
+	static bool _isNthBitSet(const int data, const int n);
 };
 
 #endif

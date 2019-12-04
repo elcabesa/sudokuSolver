@@ -35,6 +35,7 @@
 #include "boxLine.h"
 #include "xWing.h"
 #include "yWing.h"
+#include "swordfish.h"
 
 
 
@@ -75,6 +76,8 @@ public:
 		_solverStrategies.emplace_back(std::make_unique<xWing1Strategy>(_b, _cand, _verbose));
 		_solverStrategies.emplace_back(std::make_unique<xWing2Strategy>(_b, _cand, _verbose));
 		_solverStrategies.emplace_back(std::make_unique<yWingStrategy>(_b, _cand, _verbose));
+		_solverStrategies.emplace_back(std::make_unique<swordFishStrategyRow>(_b, _cand, _verbose));
+		_solverStrategies.emplace_back(std::make_unique<swordFishStrategyFile>(_b, _cand, _verbose));
 		
 		
 	};

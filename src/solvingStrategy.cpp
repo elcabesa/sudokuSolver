@@ -150,3 +150,7 @@ std::vector<tSquares> solvingStrategy::_getComplementaryList(std::vector<tSquare
 const std::string& solvingStrategy::getName() const {
 	return _name;
 }
+
+bool solvingStrategy::_isNthBitSet(const int data, const int n) {
+	return ((1<<n) & data);
+}
